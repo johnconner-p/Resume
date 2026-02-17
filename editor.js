@@ -19,16 +19,18 @@ function initEditor(data) {
 
     // 3. Init Font Size Control
     initFontSizeControl();
+
+    // 4. Init PDF Export Control (NEW)
+    initPdfControl();
     
-    // 4. Apply saved font scale if it exists
+    // 5. Apply saved font scale if it exists
     if (data.settings.fontScale) {
         updateFontScale(data.settings.fontScale);
-        // Update the slider UI to match if it exists
         const slider = document.querySelector('input[type="range"]');
         if (slider) slider.value = data.settings.fontScale;
     }
 
-    // 5. Expose helper functions for buttons
+    // 6. Expose helper functions for buttons
     window.addBullet = function(key, index) {
         if (globalData[key] && globalData[key][index]) {
             if (!globalData[key][index].bullets) globalData[key][index].bullets = [];
@@ -38,13 +40,56 @@ function initEditor(data) {
     };
 }
 
+// --- PDF Control Logic (NEW) ---
+function initPdfControl() {
+    const sidebar = document.querySelector('.editor-sidebar');
+    if (!sidebar) return;
+
+    const group = document.createElement('div');
+    group.className = 'control-group';
+    group.style.borderTop = '1px solid #4a6fa5';
+    group.style.marginTop = '15px';
+    group.style.paddingTop = '15px';
+
+    group.innerHTML = `
+        <span class="control-label">Export Resume</span>
+        <button onclick="window.print()" class="btn btn-danger">
+            <i class="fas fa-file-pdf"></i> Download PDF
+        </button>
+        <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">
+            Click to open print dialog. Choose "Save as PDF".
+        </div>
+    `;
+    sidebar.appendChild(group);
+
+    // Inject Print Styles to hide UI elements
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @media print {
+            /* Hide Interface */
+            .editor-sidebar, .format-toolbar { display: none !important; }
+            
+            /* Reset Page for Print */
+            body { padding: 0 !important; background: white !important; -webkit-print-color-adjust: exact; }
+            .page { box-shadow: none !important; margin: 0 !important; width: 100% !important; border: none !important; }
+            
+            /* Hide the Add Bullet buttons and any other buttons in the content */
+            button { display: none !important; } 
+            
+            /* Clean up Editable Areas */
+            [contenteditable] { border: none !important; outline: none !important; background: transparent !important; } 
+            #name, #title { border-bottom: none !important; }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
 // --- Font Size Control Logic ---
 function initFontSizeControl() {
-    // Locate the sidebar to inject the control
     const sidebar = document.querySelector('.editor-sidebar');
-    if (!sidebar) return; // Guard clause if sidebar doesn't exist
+    if (!sidebar) return;
 
-    // 1. Global Scale Control (Existing)
+    // 1. Global Scale Control
     const globalGroup = document.createElement('div');
     globalGroup.className = 'control-group';
     globalGroup.style.borderTop = '1px solid #4a6fa5';
@@ -60,7 +105,7 @@ function initFontSizeControl() {
     `;
     sidebar.appendChild(globalGroup);
 
-    // 2. Specific Selection Size Control (New)
+    // 2. Specific Selection Size Control
     const selectionGroup = document.createElement('div');
     selectionGroup.className = 'control-group';
     selectionGroup.style.borderTop = '1px solid #4a6fa5';
@@ -79,7 +124,6 @@ function initFontSizeControl() {
 }
 
 window.updateFontScale = function(scale) {
-    // Save to global data
     if (globalData && globalData.settings) {
         globalData.settings.fontScale = scale;
     }
@@ -93,7 +137,6 @@ window.updateFontScale = function(scale) {
         document.head.appendChild(styleTag);
     }
 
-    // Base sizes taken from standard design, scaled by the slider value
     styleTag.innerHTML = `
         body { font-size: ${10.5 * scale}pt !important; }
         .resume-header h1 { font-size: ${24 * scale}pt !important; }
@@ -117,28 +160,21 @@ window.applySelectionFontSize = function() {
     if (selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         
-        // Ensure we are editing inside the resume
         if (!document.getElementById('resume-container').contains(range.commonAncestorContainer)) {
              alert('Please select text inside the resume.');
              return;
         }
 
-        // Create a span with the font size
         const span = document.createElement('span');
         span.style.fontSize = size + 'pt';
         
-        // Extract content and wrap
         try {
             const content = range.extractContents();
             span.appendChild(content);
             range.insertNode(span);
             
-            // Trigger a blur event manually or rely on user clicking away to save, 
-            // but since we modified DOM programmatically, let's force an update if possible.
-            // Best way is to find the closest data-path parent and trigger a blur-like update logic.
             let el = span.closest('[data-path]');
             if (el) {
-                // Manually trigger the update logic
                 const path = el.dataset.path.split('.');
                 const value = el.innerHTML;
                 let ref = globalData;
@@ -148,7 +184,6 @@ window.applySelectionFontSize = function() {
                 ref[path[path.length - 1]] = value;
                 console.log('Updated style for:', path.join('.'));
             }
-
             selection.removeAllRanges();
         } catch (e) {
             console.error("Could not apply font size", e);
@@ -161,52 +196,42 @@ window.applySelectionFontSize = function() {
 
 /* --- RENDERERS (With ContentEditable) --- */
 function renderResumeEditable(data) {
-    // Header - Make Name and Title Editable
     const nameEl = document.getElementById('name');
     nameEl.innerHTML = data.profile.name; 
     nameEl.setAttribute('contenteditable', true);
     nameEl.setAttribute('data-path', 'profile.name');
-    nameEl.style.borderBottom = '1px dashed #ccc'; // Visual cue
+    nameEl.style.borderBottom = '1px dashed #ccc';
 
     const titleEl = document.getElementById('title');
     titleEl.innerHTML = data.profile.title;
     titleEl.setAttribute('contenteditable', true);
     titleEl.setAttribute('data-path', 'profile.title');
-    titleEl.style.borderBottom = '1px dashed #ccc'; // Visual cue
+    titleEl.style.borderBottom = '1px dashed #ccc'; 
 
-    // FIX FOR BUG 3: Move Contact Info below Title (inside header-left) and align side-by-side
     const headerLeft = document.querySelector('.header-left');
     const contactDiv = document.getElementById('contact');
     
     if (headerLeft && contactDiv && contactDiv.parentElement !== headerLeft) {
-        headerLeft.appendChild(contactDiv); // Move contact div inside left column
-        
-        // Reset styles to layout horizontally
+        headerLeft.appendChild(contactDiv);
         contactDiv.style.textAlign = 'left';
         contactDiv.style.marginTop = '8px';
         contactDiv.style.display = 'flex';
         contactDiv.style.flexWrap = 'wrap';
         contactDiv.style.gap = '15px';
         contactDiv.style.alignItems = 'center';
-        
-        // Remove class that might float it right
         contactDiv.classList.remove('header-right');
     }
 
     renderHeaderContacts(data.profile);
 
-    // Clear Columns
     const leftCol = document.getElementById('col-left');
     const rightCol = document.getElementById('col-right');
     leftCol.innerHTML = '';
     rightCol.innerHTML = '';
 
-    // Render Left
     data.settings.layout.left.forEach(key => renderSectionEditable(key, data, leftCol));
-    // Render Right
     data.settings.layout.right.forEach(key => renderSectionEditable(key, data, rightCol));
 
-    // Attach Input Listeners to update Global Data on change
     attachLiveUpdaters();
 }
 
@@ -218,7 +243,6 @@ function renderSectionEditable(key, data, container) {
     section.className = 'section';
     section.dataset.key = key; 
 
-    // Editable Title
     section.innerHTML = `
         <h3 class="section-title" contenteditable="true" onblur="updateTitle('${key}', this.innerText)">${sectionTitle}</h3>
     `;
@@ -227,9 +251,7 @@ function renderSectionEditable(key, data, container) {
     section.appendChild(contentDiv);
     container.appendChild(section);
 
-    // Render Content based on type
     if (key === 'summary') {
-        // Use innerHTML to preserve saved styling
         contentDiv.innerHTML = `<p class="summary-text" contenteditable="true" data-path="summary">${sectionData}</p>`;
     } else if (Array.isArray(sectionData)) {
         if (key === 'experience') renderExperienceEditable(sectionData, contentDiv, key);
@@ -239,8 +261,6 @@ function renderSectionEditable(key, data, container) {
         else if (key === 'engagements') renderEngagementsEditable(sectionData, contentDiv, key);
     }
 }
-
-// --- Specific Renderers for Editable Lists ---
 
 function renderExperienceEditable(items, container, key) {
     items.forEach((item, index) => {
@@ -322,7 +342,6 @@ function renderEngagementsEditable(items, container, key) {
 }
 
 function renderHeaderContacts(profile) {
-    // Icons placed BEFORE the text
     const contactHtml = `
         <div class="contact-row" style="display: flex; align-items: center; gap: 6px;">
             <i class="fas fa-phone-alt" style="font-size: 0.9em;"></i>
@@ -339,8 +358,6 @@ function renderHeaderContacts(profile) {
     `;
     document.getElementById('contact').innerHTML = contactHtml;
 }
-
-/* --- LOGIC: Updates & Drag-Drop --- */
 
 function attachLiveUpdaters() {
     document.querySelectorAll('[data-path]').forEach(el => {
@@ -369,8 +386,6 @@ function updateSummary(newText) {
 function renderSortableLists(layout) {
     const listLeft = document.getElementById('list-left');
     const listRight = document.getElementById('list-right');
-    
-    // Clear lists before re-rendering
     listLeft.innerHTML = '';
     listRight.innerHTML = '';
 
