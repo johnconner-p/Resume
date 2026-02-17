@@ -5,64 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Piyush Rai - Resume</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- Roboto for that crisp professional PDF look -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <div class="page" id="resume-container">
-        <!-- Header -->
-        <header class="resume-header">
-            <h1 id="name"></h1>
-            <h2 id="title"></h2>
-            <div class="contact-info" id="contact"></div>
-        </header>
+        <div class="resume-content">
+            
+            <!-- Header (Full Width or aligned with columns) -->
+            <!-- Based on your text, Header is distinct -->
+            <header class="resume-header">
+                <div class="header-left">
+                    <h1 id="name"></h1>
+                    <h2 id="title"></h2>
+                </div>
+                <div class="header-right" id="contact">
+                    <!-- Contact info injected here -->
+                </div>
+            </header>
 
-        <div class="content-grid">
-            <!-- Left Column (Main) -->
-            <div class="main-column">
-                
-                <!-- Summary -->
-                <section class="section">
-                    <h3 class="section-title">SUMMARY</h3>
-                    <p class="summary-text" id="summary"></p>
-                </section>
+            <div class="cols">
+                <!-- Left Column (Main Experience) -->
+                <div class="col-left">
+                    <!-- Summary -->
+                    <section class="section">
+                        <h3 class="section-title">SUMMARY</h3>
+                        <p class="summary-text" id="summary"></p>
+                    </section>
 
-                <!-- Experience -->
-                <section class="section">
-                    <h3 class="section-title">EXPERIENCE</h3>
-                    <div id="experience-list"></div>
-                </section>
+                    <!-- Experience -->
+                    <section class="section">
+                        <h3 class="section-title">EXPERIENCE</h3>
+                        <div id="experience-list"></div>
+                    </section>
+                </div>
 
+                <!-- Right Column (Sidebar) -->
+                <div class="col-right">
+                    
+                    <!-- Education -->
+                    <section class="section">
+                        <h3 class="section-title">EDUCATION</h3>
+                        <div id="education-list"></div>
+                    </section>
+
+                    <!-- Skills -->
+                    <section class="section">
+                        <h3 class="section-title">SKILLS</h3>
+                        <div id="skills-list"></div>
+                    </section>
+
+                    <!-- Projects -->
+                    <section class="section">
+                        <h3 class="section-title">PROJECTS</h3>
+                        <div id="projects-list"></div>
+                    </section>
+
+                    <!-- Engagements -->
+                    <section class="section">
+                        <h3 class="section-title">ENGAGEMENTS</h3>
+                        <div id="engagements-list"></div>
+                    </section>
+                </div>
             </div>
 
-            <!-- Right Column (Sidebar) -->
-            <div class="sidebar-column">
-                
-                <!-- Education -->
-                <section class="section">
-                    <h3 class="section-title">EDUCATION</h3>
-                    <div id="education-list"></div>
-                </section>
-
-                <!-- Skills -->
-                <section class="section">
-                    <h3 class="section-title">SKILLS</h3>
-                    <div id="skills-list"></div>
-                </section>
-
-                <!-- Projects -->
-                <section class="section">
-                    <h3 class="section-title">PROJECTS</h3>
-                    <div id="projects-list"></div>
-                </section>
-
-                <!-- Engagements -->
-                <section class="section">
-                    <h3 class="section-title">ENGAGEMENTS</h3>
-                    <div id="engagements-list"></div>
-                </section>
-
-            </div>
         </div>
     </div>
 

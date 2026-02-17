@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('resume.json')
         .then(response => response.json())
         .then(data => {
-            renderProfile(data.profile);
+            renderHeader(data.profile);
             renderSummary(data.summary);
             renderExperience(data.experience);
             renderEducation(data.education);
@@ -13,14 +13,24 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => console.error('Error loading resume data:', error));
 });
 
-function renderProfile(profile) {
+function renderHeader(profile) {
     document.getElementById('name').textContent = profile.name;
     document.getElementById('title').textContent = profile.title;
     
+    // Using FontAwesome Icons for strict visual match
     const contactHtml = `
-        <span>${profile.phone}</span> | 
-        <span><a href="mailto:${profile.email}">${profile.email}</a></span> | 
-        <span><a href="${profile.linkedin}">${profile.linkedin}</a></span>
+        <div class="contact-row">
+            <span>${profile.phone}</span>
+            <i class="fas fa-phone-alt"></i>
+        </div>
+        <div class="contact-row">
+            <a href="mailto:${profile.email}">${profile.email}</a>
+            <i class="fas fa-envelope"></i>
+        </div>
+        <div class="contact-row">
+            <a href="${profile.linkedin}" target="_blank">linkedin.com/in/piyush07rai</a>
+            <i class="fab fa-linkedin"></i>
+        </div>
     `;
     document.getElementById('contact').innerHTML = contactHtml;
 }
@@ -35,19 +45,18 @@ function renderExperience(experience) {
         const item = document.createElement('div');
         item.className = 'exp-item';
         
-        // Bullet points
         const bullets = job.bullets.map(b => `<li>${b}</li>`).join('');
 
         item.innerHTML = `
             <div class="exp-header">
-                <span class="exp-role">${job.role}</span>
+                <span>${job.role}</span>
                 <span>${job.duration}</span>
             </div>
-            <div class="exp-company-row">
+            <div class="exp-sub">
                 <span>${job.company}</span>
-                <span class="exp-location">${job.location}</span>
+                <span>${job.location}</span>
             </div>
-            ${job.description ? `<div class="exp-description">${job.description}</div>` : ''}
+            ${job.description ? `<div class="exp-desc">${job.description}</div>` : ''}
             <ul class="exp-bullets">
                 ${bullets}
             </ul>
@@ -62,16 +71,16 @@ function renderEducation(education) {
         const item = document.createElement('div');
         item.className = 'sidebar-item';
         item.innerHTML = `
-            <div class="sidebar-header">${edu.degree}</div>
+            <div class="sidebar-title">${edu.degree}</div>
             <div class="sidebar-sub">
                 <span>${edu.institution}</span>
             </div>
-            <div class="sidebar-sub">
+             <div class="sidebar-sub sidebar-italic">
+                <span>${edu.location}</span>
                 <span>${edu.year}</span>
-                <span>${edu.details}</span>
             </div>
             <div class="sidebar-sub">
-                <span>${edu.location}</span>
+                <span>${edu.details}</span>
             </div>
         `;
         container.appendChild(item);
@@ -82,10 +91,10 @@ function renderSkills(skills) {
     const container = document.getElementById('skills-list');
     skills.forEach(skill => {
         const item = document.createElement('div');
-        item.className = 'skills-category';
+        item.className = 'skill-group';
         item.innerHTML = `
-            <div class="skills-title">${skill.category}</div>
-            <div class="skills-text">${skill.items}</div>
+            <div class="skill-cat">${skill.category}</div>
+            <div class="skill-list">${skill.items}</div>
         `;
         container.appendChild(item);
     });
@@ -97,14 +106,14 @@ function renderProjects(projects) {
         const item = document.createElement('div');
         item.className = 'sidebar-item';
         
-        // Bullet points (optional for projects in sidebar, but checking content)
-        const bullets = proj.bullets ? `<ul class="exp-bullets" style="margin-left: 12px;">${proj.bullets.map(b => `<li>${b}</li>`).join('')}</ul>` : '';
+        const bullets = proj.bullets ? 
+            `<ul class="sidebar-bullets">${proj.bullets.map(b => `<li>${b}</li>`).join('')}</ul>` : '';
 
         item.innerHTML = `
-            <div class="sidebar-header">${proj.title}</div>
-            <div class="sidebar-sub">
-                <span>${proj.duration}</span>
+            <div class="sidebar-title">${proj.title}</div>
+            <div class="sidebar-sub sidebar-italic">
                 <span>${proj.subtitle}</span>
+                <span>${proj.duration}</span>
             </div>
             <div class="sidebar-desc">${proj.description}</div>
             ${bullets}
@@ -119,11 +128,11 @@ function renderEngagements(engagements) {
         const item = document.createElement('div');
         item.className = 'sidebar-item';
         
-        // Handle pre-formatted text (newlines)
+        // Handle newline characters in description for list effect
         const desc = eng.description.replace(/\n/g, '<br>');
 
         item.innerHTML = `
-            <div class="sidebar-header">✔ ${eng.title}</div>
+            <div class="sidebar-title"><i class="fas fa-check-circle" style="font-size: 0.8em; margin-right: 4px;"></i> ${eng.title}</div>
             <div class="sidebar-desc" style="margin-top:2px;">${desc}</div>
         `;
         container.appendChild(item);
