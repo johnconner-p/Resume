@@ -1,8 +1,16 @@
 {
     "settings": {
         "layout": {
-            "left": ["summary", "experience"],
-            "right": ["education", "skills", "projects", "engagements"]
+            "left": [
+                "summary",
+                "experience"
+            ],
+            "right": [
+                "education",
+                "skills",
+                "projects",
+                "engagements"
+            ]
         },
         "titles": {
             "summary": "SUMMARY",
@@ -27,16 +35,16 @@
             "company": "ICICI Bank",
             "location": "Mumbai, India",
             "duration": "06/2022 - Present",
-            "description": "Part of the Transaction Banking Group, catering to cash management requirements of corporates through invisible banking (APIs)",
+            "description": "Own product strategy and architecture for enterprise-grade API infrastructure powering digital payments and cash management flows (UPI, RTGS, NEFT, H2H).",
             "bullets": [
-                "Led the digital cash management transformation program, building a unified Platform for Digital Payments & Collections (UPI, RTGS, NEFT, API-based initiation), consolidating multiple legacy systems into a microservices-based architecture.",
-                "Developed and launched self-service developer's portal for API onboarding, cutting onboarding time from 1 to 2 weeks to 3-4 hours and driving 30% YoY increase in client adoption.",
-                "Spearheaded migration of 800+ Corporate clients from legacy API gateway, decommissioning outdated infrastructure within 3 quarters with zero disruptions.",
-                "Designed and rolled out real-time transaction monitoring dashboard, leveraging data-driven anomaly detection to enable faster root-cause analysis and reducing client complaints by 6% MoM.",
-                "Built a polling mechanism for outbound APIs, lowering fallout rates by 70% through predictive transaction health checks.",
-                "Launched DIY mode client onboarding platform for HTTPS and SFTP-based H2H services for corporate clients, ensuring secure and scalable STP file transfer processes.",
-                "Built an API monetization framework (Charge Master), aligning pricing with business goals and creating new revenue opportunities.",
-                "Created ROI models for strategic Products, using forecasting models and KPI benchmarking to drive data-driven investment decisions.",
+                "Architected a Unified Digital Payments Platform (UDPP) consolidating 5+ legacy systems into a microservices-based orchestration layer enabling headless API initiation for corporate clients. Supporting high-volume transaction flows with 99.9% uptime.",
+                "Built and scaled a self-service API Developer Portal, reducing Time-to-First-Call from 1–2 weeks to <4 hours and driving 30% YoY growth in API-led client adoption.",
+                "Led legacy gateway decommissioning, migrating 800+ enterprise clients from SOAP-based infrastructure to RESTful APIs within 3 quarters, achieving zero downtime and full data integrity during transition.",
+                "Designed and rolled out real-time transaction monitoring dashboards, leveraging data-driven anomaly detection to enable faster root-cause analysis and reducing client complaints by 6% MoM.",
+                "Engineered a predictive transaction health framework (intelligent polling & anomaly detection), reducing transaction fallout rates by 70% and strengthening payment success metrics during partner bank downtimes.",
+                "Launched a DIY H2H onboarding platform (HTTPS/SFTP-based STP file transfers), enabling secure, scalable integrations for Bulk Payments.",
+                "Conceptualised and implemented an API monetisation engine (\"Charge Master\"), shifting from static pricing to volume-based tiering — unlocking new revenue streams and improving pricing transparency.",
+                "Created ROI models for strategic Products, using forecasting models and KPI benchmarking to drive data-driven investment decisions for new Projects.",
                 "Partnered with a 2,000+ member business team to analyse sales trends, client data, and adoption metrics, directly shaping the product roadmap and GTM strategy."
             ]
         },
@@ -48,7 +56,7 @@
             "description": "Tech company offering engineering simulation software.",
             "bullets": [
                 "Debugged and optimized C++ source code modules in Hyperworks, improving reliability and system performance.",
-                "Automated identification of 200+ deprecated Hyperworks commands with Python, accelerating updates and ensuring seamless functionality. Collaborated within a 10-member team using Perforce version control, streamlining code management and ensuring milestone alignment."
+                "Automated identification of 200+ deprecated Hyperworks commands with Python, accelerating updates and ensuring seamless functionality.\nCollaborated within a 10-member team using Perforce version control, streamlining code management and ensuring milestone alignment."
             ]
         }
     ],
