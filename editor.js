@@ -20,9 +20,17 @@ function initEditor(data) {
 
 /* --- RENDERERS (With ContentEditable) --- */
 function renderResumeEditable(data) {
-    // Header
-    document.getElementById('name').textContent = data.profile.name;
-    document.getElementById('title').textContent = data.profile.title;
+    // Header - Make Name and Title Editable
+    const nameEl = document.getElementById('name');
+    nameEl.textContent = data.profile.name;
+    nameEl.setAttribute('contenteditable', true);
+    nameEl.setAttribute('data-path', 'profile.name');
+
+    const titleEl = document.getElementById('title');
+    titleEl.textContent = data.profile.title;
+    titleEl.setAttribute('contenteditable', true);
+    titleEl.setAttribute('data-path', 'profile.title');
+
     renderHeaderContacts(data.profile);
 
     // Clear Columns
@@ -62,10 +70,6 @@ function renderSectionEditable(key, data, container) {
         contentDiv.innerHTML = `<p class="summary-text" contenteditable="true" onblur="updateSummary(this.innerText)">${sectionData}</p>`;
     } else if (Array.isArray(sectionData)) {
         // Handle Arrays (Experience, etc.)
-        // Simplified: We render them as contenteditable blocks. 
-        // Note: For full complex array editing, we ideally need dedicated forms, but here we will allow text editing of rendered HTML.
-        // To keep it robust, we will just re-render standard HTML but enable editing on specific fields.
-        
         if (key === 'experience') renderExperienceEditable(sectionData, contentDiv, key);
         else if (key === 'education') renderEducationEditable(sectionData, contentDiv, key);
         else if (key === 'skills') renderSkillsEditable(sectionData, contentDiv, key);
@@ -75,9 +79,6 @@ function renderSectionEditable(key, data, container) {
 }
 
 // --- Specific Renderers for Editable Lists ---
-// NOTE: For the sake of this code block size, I am implementing the text-update logic.
-// In a real generic editor, mapping DOM back to JSON arrays is complex. 
-// Here we assume the user modifies text, and we update the JSON reference.
 
 function renderExperienceEditable(items, container, key) {
     items.forEach((item, index) => {
@@ -148,7 +149,6 @@ function renderEngagementsEditable(items, container, key) {
     items.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'sidebar-item';
-        // Replace newlines with <br> for display, but logic assumes string
         div.innerHTML = `
             <div class="sidebar-title"><i class="fas fa-check-circle"></i> <span contenteditable="true" data-path="${key}.${index}.title">${item.title}</span></div>
             <div class="sidebar-desc" contenteditable="true" data-path="${key}.${index}.description">${item.description}</div>
@@ -158,11 +158,20 @@ function renderEngagementsEditable(items, container, key) {
 }
 
 function renderHeaderContacts(profile) {
-    // Simplified contact rendering (not editable individually for now to save space, user can edit json for this)
+    // Enable editing for contact details
     const contactHtml = `
-        <div class="contact-row"><span>${profile.phone}</span> <i class="fas fa-phone-alt"></i></div>
-        <div class="contact-row"><a href="#">${profile.email}</a> <i class="fas fa-envelope"></i></div>
-        <div class="contact-row"><a href="#">Link</a> <i class="fab fa-linkedin"></i></div>
+        <div class="contact-row">
+            <span contenteditable="true" data-path="profile.phone">${profile.phone}</span> 
+            <i class="fas fa-phone-alt"></i>
+        </div>
+        <div class="contact-row">
+            <span contenteditable="true" data-path="profile.email">${profile.email}</span> 
+            <i class="fas fa-envelope"></i>
+        </div>
+        <div class="contact-row">
+            <span contenteditable="true" data-path="profile.linkedin">${profile.linkedin}</span> 
+            <i class="fab fa-linkedin"></i>
+        </div>
     `;
     document.getElementById('contact').innerHTML = contactHtml;
 }
@@ -174,7 +183,7 @@ function attachLiveUpdaters() {
     document.querySelectorAll('[data-path]').forEach(el => {
         el.addEventListener('blur', (e) => {
             const path = e.target.dataset.path.split('.');
-            const value = e.target.innerText; // Use innerText to strip HTML tags for data consistency, or innerHTML if we want to save bold tags
+            const value = e.target.innerText; // Use innerText to strip HTML tags
             
             // Traverse globalData to update value
             let ref = globalData;
