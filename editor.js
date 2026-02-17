@@ -19,8 +19,16 @@ function initEditor(data) {
 
     // 3. Init Font Size Control
     initFontSizeControl();
+    
+    // 4. Apply saved font scale if it exists
+    if (data.settings.fontScale) {
+        updateFontScale(data.settings.fontScale);
+        // Update the slider UI to match if it exists
+        const slider = document.querySelector('input[type="range"]');
+        if (slider) slider.value = data.settings.fontScale;
+    }
 
-    // 4. Expose helper functions for buttons
+    // 5. Expose helper functions for buttons
     window.addBullet = function(key, index) {
         if (globalData[key] && globalData[key][index]) {
             if (!globalData[key][index].bullets) globalData[key][index].bullets = [];
@@ -71,6 +79,11 @@ function initFontSizeControl() {
 }
 
 window.updateFontScale = function(scale) {
+    // Save to global data
+    if (globalData && globalData.settings) {
+        globalData.settings.fontScale = scale;
+    }
+
     const styleId = 'dynamic-font-scale';
     let styleTag = document.getElementById(styleId);
     
@@ -150,8 +163,6 @@ window.applySelectionFontSize = function() {
 function renderResumeEditable(data) {
     // Header - Make Name and Title Editable
     const nameEl = document.getElementById('name');
-    nameEl.textContent = data.profile.name; // Note: innerHTML logic is handled in updates, initial load assumes clean text usually, but if saving HTML, should use innerHTML here too? 
-    // Ideally use innerHTML for all initial renders to support rich text loading
     nameEl.innerHTML = data.profile.name; 
     nameEl.setAttribute('contenteditable', true);
     nameEl.setAttribute('data-path', 'profile.name');
@@ -230,9 +241,6 @@ function renderSectionEditable(key, data, container) {
 }
 
 // --- Specific Renderers for Editable Lists ---
-// UPDATED all renderers to use innerHTML instead of just interpolating string, 
-// though template literals ${item} do insertion. 
-// The key is attachLiveUpdaters reading innerHTML.
 
 function renderExperienceEditable(items, container, key) {
     items.forEach((item, index) => {
@@ -338,7 +346,6 @@ function attachLiveUpdaters() {
     document.querySelectorAll('[data-path]').forEach(el => {
         el.addEventListener('blur', (e) => {
             const path = e.target.dataset.path.split('.');
-            // Changed from innerText to innerHTML to save rich text (bold, font size spans)
             const value = e.target.innerHTML; 
             
             let ref = globalData;
@@ -351,21 +358,11 @@ function attachLiveUpdaters() {
     });
 }
 
-// ... existing helper functions (updateTitle, updateSummary, renderSortableLists, etc.) ...
 function updateTitle(key, newTitle) {
     globalData.settings.titles[key] = newTitle;
 }
 
 function updateSummary(newText) {
-    // NOTE: This handles the specific onblur for Summary P tag which calls this function directly
-    // Ideally should use data-path methodology, but kept for compatibility with existing inline onblur
-    // But updated to use innerHTML if we change the onblur call, 
-    // actually the onblur in renderSectionEditable calls updateSummary(this.innerText)
-    // We should probably rely on the data-path listener instead to capture rich text.
-    // However, the data-path listener is attached in attachLiveUpdaters.
-    // The inline onblur="updateSummary" might conflict or overwrite with plain text if not careful.
-    // Better to update the inline call or remove it and rely on data-path.
-    // I will let data-path handle it and make this function do nothing or update safely.
     globalData.summary = newText;
 }
 
