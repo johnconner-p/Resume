@@ -36,24 +36,38 @@ function initFontSizeControl() {
     const sidebar = document.querySelector('.editor-sidebar');
     if (!sidebar) return; // Guard clause if sidebar doesn't exist
 
-    // Create the control group
-    const controlGroup = document.createElement('div');
-    controlGroup.className = 'control-group';
-    controlGroup.style.borderTop = '1px solid #4a6fa5';
-    controlGroup.style.marginTop = '15px';
-    controlGroup.style.paddingTop = '15px';
+    // 1. Global Scale Control (Existing)
+    const globalGroup = document.createElement('div');
+    globalGroup.className = 'control-group';
+    globalGroup.style.borderTop = '1px solid #4a6fa5';
+    globalGroup.style.marginTop = '15px';
+    globalGroup.style.paddingTop = '15px';
     
-    controlGroup.innerHTML = `
+    globalGroup.innerHTML = `
         <span class="control-label">Global Font Scale</span>
         <input type="range" min="0.8" max="1.3" step="0.05" value="1" 
                oninput="updateFontScale(this.value)" 
                style="width: 100%; cursor: pointer;">
         <div style="font-size: 10px; opacity: 0.7; margin-top: 5px; text-align: right;">(80% - 130%)</div>
     `;
+    sidebar.appendChild(globalGroup);
 
-    // Append to sidebar (before the buttons typically)
-    // Find the 'Tools' or last group to insert before, or just append
-    sidebar.appendChild(controlGroup);
+    // 2. Specific Selection Size Control (New)
+    const selectionGroup = document.createElement('div');
+    selectionGroup.className = 'control-group';
+    selectionGroup.style.borderTop = '1px solid #4a6fa5';
+    selectionGroup.style.marginTop = '15px';
+    selectionGroup.style.paddingTop = '15px';
+
+    selectionGroup.innerHTML = `
+        <span class="control-label">Selected Text Size (pt)</span>
+        <div style="display:flex; gap:5px; align-items: center;">
+            <input type="number" id="fontSizeInput" value="11" style="width: 60px; padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+            <button onclick="applySelectionFontSize()" class="btn btn-primary" style="margin:0; padding: 5px 10px; font-size: 12px; flex: 1;">Apply</button>
+        </div>
+        <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">Highlight text, set size, click Apply.</div>
+    `;
+    sidebar.appendChild(selectionGroup);
 }
 
 window.updateFontScale = function(scale) {
@@ -81,17 +95,70 @@ window.updateFontScale = function(scale) {
     `;
 };
 
+window.applySelectionFontSize = function() {
+    const sizeInput = document.getElementById('fontSizeInput');
+    const size = sizeInput.value;
+    if (!size) return;
+
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        
+        // Ensure we are editing inside the resume
+        if (!document.getElementById('resume-container').contains(range.commonAncestorContainer)) {
+             alert('Please select text inside the resume.');
+             return;
+        }
+
+        // Create a span with the font size
+        const span = document.createElement('span');
+        span.style.fontSize = size + 'pt';
+        
+        // Extract content and wrap
+        try {
+            const content = range.extractContents();
+            span.appendChild(content);
+            range.insertNode(span);
+            
+            // Trigger a blur event manually or rely on user clicking away to save, 
+            // but since we modified DOM programmatically, let's force an update if possible.
+            // Best way is to find the closest data-path parent and trigger a blur-like update logic.
+            let el = span.closest('[data-path]');
+            if (el) {
+                // Manually trigger the update logic
+                const path = el.dataset.path.split('.');
+                const value = el.innerHTML;
+                let ref = globalData;
+                for (let i = 0; i < path.length - 1; i++) {
+                    ref = ref[path[i]];
+                }
+                ref[path[path.length - 1]] = value;
+                console.log('Updated style for:', path.join('.'));
+            }
+
+            selection.removeAllRanges();
+        } catch (e) {
+            console.error("Could not apply font size", e);
+            alert("Could not apply style. Ensure you are selecting text within a single section.");
+        }
+    } else {
+        alert('Please select some text first.');
+    }
+};
+
 /* --- RENDERERS (With ContentEditable) --- */
 function renderResumeEditable(data) {
     // Header - Make Name and Title Editable
     const nameEl = document.getElementById('name');
-    nameEl.textContent = data.profile.name;
+    nameEl.textContent = data.profile.name; // Note: innerHTML logic is handled in updates, initial load assumes clean text usually, but if saving HTML, should use innerHTML here too? 
+    // Ideally use innerHTML for all initial renders to support rich text loading
+    nameEl.innerHTML = data.profile.name; 
     nameEl.setAttribute('contenteditable', true);
     nameEl.setAttribute('data-path', 'profile.name');
     nameEl.style.borderBottom = '1px dashed #ccc'; // Visual cue
 
     const titleEl = document.getElementById('title');
-    titleEl.textContent = data.profile.title;
+    titleEl.innerHTML = data.profile.title;
     titleEl.setAttribute('contenteditable', true);
     titleEl.setAttribute('data-path', 'profile.title');
     titleEl.style.borderBottom = '1px dashed #ccc'; // Visual cue
@@ -151,7 +218,8 @@ function renderSectionEditable(key, data, container) {
 
     // Render Content based on type
     if (key === 'summary') {
-        contentDiv.innerHTML = `<p class="summary-text" contenteditable="true" onblur="updateSummary(this.innerText)">${sectionData}</p>`;
+        // Use innerHTML to preserve saved styling
+        contentDiv.innerHTML = `<p class="summary-text" contenteditable="true" data-path="summary">${sectionData}</p>`;
     } else if (Array.isArray(sectionData)) {
         if (key === 'experience') renderExperienceEditable(sectionData, contentDiv, key);
         else if (key === 'education') renderEducationEditable(sectionData, contentDiv, key);
@@ -162,6 +230,9 @@ function renderSectionEditable(key, data, container) {
 }
 
 // --- Specific Renderers for Editable Lists ---
+// UPDATED all renderers to use innerHTML instead of just interpolating string, 
+// though template literals ${item} do insertion. 
+// The key is attachLiveUpdaters reading innerHTML.
 
 function renderExperienceEditable(items, container, key) {
     items.forEach((item, index) => {
@@ -267,7 +338,8 @@ function attachLiveUpdaters() {
     document.querySelectorAll('[data-path]').forEach(el => {
         el.addEventListener('blur', (e) => {
             const path = e.target.dataset.path.split('.');
-            const value = e.target.innerText;
+            // Changed from innerText to innerHTML to save rich text (bold, font size spans)
+            const value = e.target.innerHTML; 
             
             let ref = globalData;
             for (let i = 0; i < path.length - 1; i++) {
@@ -279,11 +351,21 @@ function attachLiveUpdaters() {
     });
 }
 
+// ... existing helper functions (updateTitle, updateSummary, renderSortableLists, etc.) ...
 function updateTitle(key, newTitle) {
     globalData.settings.titles[key] = newTitle;
 }
 
 function updateSummary(newText) {
+    // NOTE: This handles the specific onblur for Summary P tag which calls this function directly
+    // Ideally should use data-path methodology, but kept for compatibility with existing inline onblur
+    // But updated to use innerHTML if we change the onblur call, 
+    // actually the onblur in renderSectionEditable calls updateSummary(this.innerText)
+    // We should probably rely on the data-path listener instead to capture rich text.
+    // However, the data-path listener is attached in attachLiveUpdaters.
+    // The inline onblur="updateSummary" might conflict or overwrite with plain text if not careful.
+    // Better to update the inline call or remove it and rely on data-path.
+    // I will let data-path handle it and make this function do nothing or update safely.
     globalData.summary = newText;
 }
 
