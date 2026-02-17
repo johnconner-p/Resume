@@ -17,7 +17,10 @@ function initEditor(data) {
     // 2. Render the Visual Resume
     renderResumeEditable(data);
 
-    // 3. Expose helper functions for buttons
+    // 3. Init Font Size Control
+    initFontSizeControl();
+
+    // 4. Expose helper functions for buttons
     window.addBullet = function(key, index) {
         if (globalData[key] && globalData[key][index]) {
             if (!globalData[key][index].bullets) globalData[key][index].bullets = [];
@@ -26,6 +29,57 @@ function initEditor(data) {
         }
     };
 }
+
+// --- Font Size Control Logic ---
+function initFontSizeControl() {
+    // Locate the sidebar to inject the control
+    const sidebar = document.querySelector('.editor-sidebar');
+    if (!sidebar) return; // Guard clause if sidebar doesn't exist
+
+    // Create the control group
+    const controlGroup = document.createElement('div');
+    controlGroup.className = 'control-group';
+    controlGroup.style.borderTop = '1px solid #4a6fa5';
+    controlGroup.style.marginTop = '15px';
+    controlGroup.style.paddingTop = '15px';
+    
+    controlGroup.innerHTML = `
+        <span class="control-label">Global Font Scale</span>
+        <input type="range" min="0.8" max="1.3" step="0.05" value="1" 
+               oninput="updateFontScale(this.value)" 
+               style="width: 100%; cursor: pointer;">
+        <div style="font-size: 10px; opacity: 0.7; margin-top: 5px; text-align: right;">(80% - 130%)</div>
+    `;
+
+    // Append to sidebar (before the buttons typically)
+    // Find the 'Tools' or last group to insert before, or just append
+    sidebar.appendChild(controlGroup);
+}
+
+window.updateFontScale = function(scale) {
+    const styleId = 'dynamic-font-scale';
+    let styleTag = document.getElementById(styleId);
+    
+    if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = styleId;
+        document.head.appendChild(styleTag);
+    }
+
+    // Base sizes taken from standard design, scaled by the slider value
+    styleTag.innerHTML = `
+        body { font-size: ${10.5 * scale}pt !important; }
+        .resume-header h1 { font-size: ${24 * scale}pt !important; }
+        .resume-header h2 { font-size: ${10 * scale}pt !important; }
+        .section-title { font-size: ${11 * scale}pt !important; }
+        .exp-header { font-size: ${10.5 * scale}pt !important; }
+        .sidebar-title { font-size: ${10.5 * scale}pt !important; }
+        .exp-desc, .sidebar-desc, .skill-list, li { font-size: ${10 * scale}pt !important; }
+        .exp-sub, .sidebar-sub { font-size: ${10 * scale}pt !important; }
+        .contact-row { font-size: ${9 * scale}pt !important; }
+        .contact-row i { font-size: ${10 * scale}pt !important; }
+    `;
+};
 
 /* --- RENDERERS (With ContentEditable) --- */
 function renderResumeEditable(data) {
@@ -189,20 +243,19 @@ function renderEngagementsEditable(items, container, key) {
 }
 
 function renderHeaderContacts(profile) {
-    // Enable editing for contact details with better click targets
-    // Updated to use flex row layout for side-by-side alignment
+    // Icons placed BEFORE the text
     const contactHtml = `
         <div class="contact-row" style="display: flex; align-items: center; gap: 6px;">
-            <span contenteditable="true" data-path="profile.phone" style="min-width: 50px; cursor: text;">${profile.phone}</span> 
             <i class="fas fa-phone-alt" style="font-size: 0.9em;"></i>
+            <span contenteditable="true" data-path="profile.phone" style="min-width: 50px; cursor: text;">${profile.phone}</span> 
         </div>
         <div class="contact-row" style="display: flex; align-items: center; gap: 6px;">
-            <span contenteditable="true" data-path="profile.email" style="min-width: 50px; cursor: text;">${profile.email}</span> 
             <i class="fas fa-envelope" style="font-size: 0.9em;"></i>
+            <span contenteditable="true" data-path="profile.email" style="min-width: 50px; cursor: text;">${profile.email}</span> 
         </div>
         <div class="contact-row" style="display: flex; align-items: center; gap: 6px;">
-            <span contenteditable="true" data-path="profile.linkedin" style="min-width: 50px; cursor: text;">${profile.linkedin}</span> 
             <i class="fab fa-linkedin" style="font-size: 0.9em;"></i>
+            <span contenteditable="true" data-path="profile.linkedin" style="min-width: 50px; cursor: text;">${profile.linkedin}</span> 
         </div>
     `;
     document.getElementById('contact').innerHTML = contactHtml;
