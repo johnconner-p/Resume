@@ -42,6 +42,25 @@ function renderResumeEditable(data) {
     titleEl.setAttribute('data-path', 'profile.title');
     titleEl.style.borderBottom = '1px dashed #ccc'; // Visual cue
 
+    // FIX FOR BUG 3: Move Contact Info below Title (inside header-left) and align side-by-side
+    const headerLeft = document.querySelector('.header-left');
+    const contactDiv = document.getElementById('contact');
+    
+    if (headerLeft && contactDiv && contactDiv.parentElement !== headerLeft) {
+        headerLeft.appendChild(contactDiv); // Move contact div inside left column
+        
+        // Reset styles to layout horizontally
+        contactDiv.style.textAlign = 'left';
+        contactDiv.style.marginTop = '8px';
+        contactDiv.style.display = 'flex';
+        contactDiv.style.flexWrap = 'wrap';
+        contactDiv.style.gap = '15px';
+        contactDiv.style.alignItems = 'center';
+        
+        // Remove class that might float it right
+        contactDiv.classList.remove('header-right');
+    }
+
     renderHeaderContacts(data.profile);
 
     // Clear Columns
@@ -171,18 +190,19 @@ function renderEngagementsEditable(items, container, key) {
 
 function renderHeaderContacts(profile) {
     // Enable editing for contact details with better click targets
+    // Updated to use flex row layout for side-by-side alignment
     const contactHtml = `
-        <div class="contact-row">
-            <span contenteditable="true" data-path="profile.phone" style="min-width: 50px; display: inline-block; cursor: text;">${profile.phone}</span> 
-            <i class="fas fa-phone-alt"></i>
+        <div class="contact-row" style="display: flex; align-items: center; gap: 6px;">
+            <span contenteditable="true" data-path="profile.phone" style="min-width: 50px; cursor: text;">${profile.phone}</span> 
+            <i class="fas fa-phone-alt" style="font-size: 0.9em;"></i>
         </div>
-        <div class="contact-row">
-            <span contenteditable="true" data-path="profile.email" style="min-width: 50px; display: inline-block; cursor: text;">${profile.email}</span> 
-            <i class="fas fa-envelope"></i>
+        <div class="contact-row" style="display: flex; align-items: center; gap: 6px;">
+            <span contenteditable="true" data-path="profile.email" style="min-width: 50px; cursor: text;">${profile.email}</span> 
+            <i class="fas fa-envelope" style="font-size: 0.9em;"></i>
         </div>
-        <div class="contact-row">
-            <span contenteditable="true" data-path="profile.linkedin" style="min-width: 50px; display: inline-block; cursor: text;">${profile.linkedin}</span> 
-            <i class="fab fa-linkedin"></i>
+        <div class="contact-row" style="display: flex; align-items: center; gap: 6px;">
+            <span contenteditable="true" data-path="profile.linkedin" style="min-width: 50px; cursor: text;">${profile.linkedin}</span> 
+            <i class="fab fa-linkedin" style="font-size: 0.9em;"></i>
         </div>
     `;
     document.getElementById('contact').innerHTML = contactHtml;
