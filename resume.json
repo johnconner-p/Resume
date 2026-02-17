@@ -23,21 +23,21 @@
     },
     "profile": {
         "name": "PIYUSH RAI",
-        "title": "Product Manager | Fintech & AI/ML | Digital Transformation & Data-Driven Strategy",
+        "title": "<span style=\"font-size: 11pt;\">Product Manager | Fintech &amp; AI/ML | Digital Transformation &amp; Data-Driven Strategy</span>",
         "phone": "+91 6005044517",
         "email": "piyush07rai@gmail.com",
         "linkedin": "https://linkedin.com/in/piyush07rai"
     },
-    "summary": "Product Manager with 4 years of experience building API-led platforms and scaling enterprise-grade digital systems. Proven track record of driving architecture modernization, improving operational resilience, and enabling self-serve product adoption. Combines engineering fluency with data-driven decision-making to prioritize high-impact roadmap investments.",
+    "summary": "<span style=\"font-size: 10pt;\">Product Manager with 4 years of experience building scalable, API-driven platforms in complex enterprise environments. Led legacy modernization and distributed system initiatives by defining clear product strategies, prioritizing high-impact trade-offs, and improving reliability and adoption through measurable outcomes. Known for structuring ambiguous problems into scalable solutions that balance technical feasibility, user needs, and business impact.</span>",
     "experience": [
         {
             "role": "Product Manager - II",
             "company": "ICICI Bank",
             "location": "Mumbai, India",
             "duration": "06/2022 - Present",
-            "description": "Own product strategy and architecture for enterprise-grade API infrastructure powering digital payments and cash management flows (UPI, RTGS, NEFT, H2H).",
+            "description": "<p data-start=\"717\" data-end=\"872\"><span style=\"font-size: 10pt;\"><span style=\"font-size: 10pt;\">Define and drive product strategy for enterprise-grade API infrastructure supporting high-volume &amp; distributed workflows&nbsp;</span></span></p>",
             "bullets": [
-                "Architected a Unified Digital Payments Platform, consolidating 5+ legacy systems into a microservices-based orchestration layer, enabling headless API initiation for corporate clients. Supporting high-volume transaction flows with 99.9% uptime.",
+                "Architected a Unified Digital Payments Platform, consolidating 5+ legacy systems into a microservices-based orchestration layer, enabling headless API initiation for clients. Includes channels like UPI, NEFT, RTGS etc.",
                 "Built and scaled a self-service API Developer Portal, reducing Time-to-First-Call from 1–2 weeks to <4 hours and driving 30% YoY growth in API-led client adoption.",
                 "Led legacy gateway decommissioning, migrating 800+ enterprise clients from SOAP-based infrastructure to RESTful APIs within 3 quarters, achieving zero downtime and full data integrity during transition.",
                 "Designed and rolled out real-time transaction monitoring dashboards, leveraging data-driven anomaly detection to enable faster root-cause analysis and reducing client complaints by 6% MoM.",
@@ -67,25 +67,25 @@
             "institution": "Indian Institute of Technology Jammu",
             "location": "Jammu, India",
             "year": "08/2018 - 05/2022",
-            "details": "CGPA 7.73/10"
+            "details": "<span style=\"font-size: 10pt;\">CGPA 7.73/10</span>"
         }
     ],
     "skills": [
         {
             "category": "Product & Strategy",
-            "items": "Product Roadmapping, Go to Market Strategy, KPIs Definition, A/B Testing, Market & User Research, RCA"
+            "items": "<span style=\"font-size: 10pt;\">Product Roadmapping, Go to Market Strategy, KPIs Definition, A/B Testing, Market &amp; User Research, RCA</span>"
         },
         {
             "category": "Platform & API",
-            "items": "API Lifecycle Management, RESTful API Design, Webhooks vs Polling, Idempotency Concepts, API Versioning, Microservices Architecture, System Design Fundamentals"
+            "items": "<span style=\"font-size: 10pt;\">API Lifecycle Management, RESTful API Design, Webhooks vs Polling, Idempotency Concepts, API Versioning, Microservices Architecture, System Design Fundamentals</span>"
         },
         {
             "category": "Data & Observability",
-            "items": "SQL, Excel, Funnel Analysis, Dashboarding (Power BI), Forecast Modeling, Adoption & Retention Metrics"
+            "items": "<span style=\"font-size: 10pt;\">SQL, Excel, Funnel Analysis, Dashboarding (Power BI), Forecast Modeling, Adoption &amp; Retention Metrics</span>"
         },
         {
             "category": "Technical Foundation",
-            "items": "Python, C++, JSON, OpenAPI/Swagger, Postman, Git/Perforce, Agile/Scrum, AI Tools"
+            "items": "<span style=\"font-size: 10pt;\">Python, C++, JSON, OpenAPI/Swagger, Postman, Git/Perforce, Agile/Sc<span style=\"font-size: 10pt;\"></span>rum, AI Tools</span>"
         }
     ],
     "projects": [
@@ -117,7 +117,7 @@
         },
         {
             "title": "Community Involvement and Leadership",
-            "description": "• Volunteer teacher for Senior Secondary Mathematics at Angelxpress NGO\n• IIT Jammu Basketball Team Captain (2019-2022) & Inter-IIT Sports Meet 2019"
+            "description": "• Volunteer teacher for Senior Secondary Mathematics at Angelxpress NGO&nbsp;<div>• IIT Jammu Basketball Team Captain (2019-2022) &amp; Inter-IIT Sports Meet 2019</div>"
         }
     ]
 }
