@@ -16,6 +16,15 @@ function initEditor(data) {
 
     // 2. Render the Visual Resume
     renderResumeEditable(data);
+
+    // 3. Expose helper functions for buttons
+    window.addBullet = function(key, index) {
+        if (globalData[key] && globalData[key][index]) {
+            if (!globalData[key][index].bullets) globalData[key][index].bullets = [];
+            globalData[key][index].bullets.push("New bullet");
+            renderResumeEditable(globalData); // Re-render to show new bullet
+        }
+    };
 }
 
 /* --- RENDERERS (With ContentEditable) --- */
@@ -25,11 +34,13 @@ function renderResumeEditable(data) {
     nameEl.textContent = data.profile.name;
     nameEl.setAttribute('contenteditable', true);
     nameEl.setAttribute('data-path', 'profile.name');
+    nameEl.style.borderBottom = '1px dashed #ccc'; // Visual cue
 
     const titleEl = document.getElementById('title');
     titleEl.textContent = data.profile.title;
     titleEl.setAttribute('contenteditable', true);
     titleEl.setAttribute('data-path', 'profile.title');
+    titleEl.style.borderBottom = '1px dashed #ccc'; // Visual cue
 
     renderHeaderContacts(data.profile);
 
@@ -54,7 +65,7 @@ function renderSectionEditable(key, data, container) {
     
     const section = document.createElement('section');
     section.className = 'section';
-    section.dataset.key = key; // For identifying which section this is
+    section.dataset.key = key; 
 
     // Editable Title
     section.innerHTML = `
@@ -69,7 +80,6 @@ function renderSectionEditable(key, data, container) {
     if (key === 'summary') {
         contentDiv.innerHTML = `<p class="summary-text" contenteditable="true" onblur="updateSummary(this.innerText)">${sectionData}</p>`;
     } else if (Array.isArray(sectionData)) {
-        // Handle Arrays (Experience, etc.)
         if (key === 'experience') renderExperienceEditable(sectionData, contentDiv, key);
         else if (key === 'education') renderEducationEditable(sectionData, contentDiv, key);
         else if (key === 'skills') renderSkillsEditable(sectionData, contentDiv, key);
@@ -97,6 +107,7 @@ function renderExperienceEditable(items, container, key) {
             <ul class="exp-bullets">
                 ${item.bullets.map((b, bIndex) => `<li contenteditable="true" data-path="${key}.${index}.bullets.${bIndex}">${b}</li>`).join('')}
             </ul>
+            <button onclick="addBullet('${key}', ${index})" style="background:none; border:none; color:blue; font-size:10px; cursor:pointer; margin-left:15px;">+ Add Bullet</button>
         `;
         container.appendChild(div);
     });
@@ -140,6 +151,7 @@ function renderProjectsEditable(items, container, key) {
             </div>
             <div class="sidebar-desc" contenteditable="true" data-path="${key}.${index}.description">${item.description}</div>
             ${item.bullets ? `<ul class="sidebar-bullets">${item.bullets.map((b, bi) => `<li contenteditable="true" data-path="${key}.${index}.bullets.${bi}">${b}</li>`).join('')}</ul>` : ''}
+            <button onclick="addBullet('${key}', ${index})" style="background:none; border:none; color:blue; font-size:10px; cursor:pointer; margin-left:12px;">+ Add Bullet</button>
         `;
         container.appendChild(div);
     });
@@ -158,18 +170,18 @@ function renderEngagementsEditable(items, container, key) {
 }
 
 function renderHeaderContacts(profile) {
-    // Enable editing for contact details
+    // Enable editing for contact details with better click targets
     const contactHtml = `
         <div class="contact-row">
-            <span contenteditable="true" data-path="profile.phone">${profile.phone}</span> 
+            <span contenteditable="true" data-path="profile.phone" style="min-width: 50px; display: inline-block; cursor: text;">${profile.phone}</span> 
             <i class="fas fa-phone-alt"></i>
         </div>
         <div class="contact-row">
-            <span contenteditable="true" data-path="profile.email">${profile.email}</span> 
+            <span contenteditable="true" data-path="profile.email" style="min-width: 50px; display: inline-block; cursor: text;">${profile.email}</span> 
             <i class="fas fa-envelope"></i>
         </div>
         <div class="contact-row">
-            <span contenteditable="true" data-path="profile.linkedin">${profile.linkedin}</span> 
+            <span contenteditable="true" data-path="profile.linkedin" style="min-width: 50px; display: inline-block; cursor: text;">${profile.linkedin}</span> 
             <i class="fab fa-linkedin"></i>
         </div>
     `;
@@ -178,14 +190,12 @@ function renderHeaderContacts(profile) {
 
 /* --- LOGIC: Updates & Drag-Drop --- */
 
-// Live Update Logic: When user types, update globalData
 function attachLiveUpdaters() {
     document.querySelectorAll('[data-path]').forEach(el => {
         el.addEventListener('blur', (e) => {
             const path = e.target.dataset.path.split('.');
-            const value = e.target.innerText; // Use innerText to strip HTML tags
+            const value = e.target.innerText;
             
-            // Traverse globalData to update value
             let ref = globalData;
             for (let i = 0; i < path.length - 1; i++) {
                 ref = ref[path[i]];
@@ -204,12 +214,14 @@ function updateSummary(newText) {
     globalData.summary = newText;
 }
 
-// Drag and Drop Sidebar
 function renderSortableLists(layout) {
     const listLeft = document.getElementById('list-left');
     const listRight = document.getElementById('list-right');
     
-    // Helper to create list items
+    // Clear lists before re-rendering
+    listLeft.innerHTML = '';
+    listRight.innerHTML = '';
+
     const createLi = (id) => {
         const li = document.createElement('li');
         li.className = 'sortable-item';
@@ -221,25 +233,20 @@ function renderSortableLists(layout) {
     layout.left.forEach(id => listLeft.appendChild(createLi(id)));
     layout.right.forEach(id => listRight.appendChild(createLi(id)));
 
-    // Init SortableJS
     new Sortable(listLeft, { group: 'sections', animation: 150 });
     new Sortable(listRight, { group: 'sections', animation: 150 });
 }
 
 function updateLayoutFromSidebar() {
-    // Read the new order from DOM
     const leftItems = Array.from(document.getElementById('list-left').children).map(li => li.dataset.id);
     const rightItems = Array.from(document.getElementById('list-right').children).map(li => li.dataset.id);
 
-    // Update Data
     globalData.settings.layout.left = leftItems;
     globalData.settings.layout.right = rightItems;
 
-    // Re-render editor to show changes
     renderResumeEditable(globalData);
 }
 
-// Download JSON
 function downloadJson() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalData, null, 4));
     const downloadAnchorNode = document.createElement('a');
