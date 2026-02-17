@@ -1,4 +1,18 @@
 {
+    "settings": {
+        "layout": {
+            "left": ["summary", "experience"],
+            "right": ["education", "skills", "projects", "engagements"]
+        },
+        "titles": {
+            "summary": "SUMMARY",
+            "experience": "EXPERIENCE",
+            "education": "EDUCATION",
+            "skills": "SKILLS",
+            "projects": "PROJECTS",
+            "engagements": "ENGAGEMENTS"
+        }
+    },
     "profile": {
         "name": "PIYUSH RAI",
         "title": "Product Manager | Fintech & AI/ML | Digital Transformation & Data-Driven Strategy",
