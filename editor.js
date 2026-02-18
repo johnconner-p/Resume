@@ -26,6 +26,23 @@ function initEditor(data) {
         if (slider) slider.value = data.settings.fontScale;
     }
 
+    // --- ATS FIX: Convert to static text before printing ---
+    window.addEventListener('beforeprint', () => {
+        // Remove editability to ensure printer sees plain text, not form fields
+        document.querySelectorAll('[contenteditable]').forEach(el => {
+            el.removeAttribute('contenteditable');
+        });
+        // Remove inline visual cues (dashed borders) temporarily
+        document.getElementById('name').style.borderBottom = 'none';
+        document.getElementById('title').style.borderBottom = 'none';
+    });
+
+    window.addEventListener('afterprint', () => {
+        // Restore editor state immediately after print dialog closes
+        renderResumeEditable(globalData);
+    });
+    // -------------------------------------------------------
+
     window.addBullet = function(key, index) {
         if (globalData[key] && globalData[key][index]) {
             if (!globalData[key][index].bullets) globalData[key][index].bullets = [];
