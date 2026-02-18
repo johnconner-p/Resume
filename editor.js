@@ -312,14 +312,21 @@ function renderExperienceEditable(items, container, key) {
     items.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'exp-item';
+        // Added calendar icon for duration and map marker for location
         div.innerHTML = `
             <div class="exp-header">
                 <span contenteditable="true" data-path="${key}.${index}.role">${item.role}</span>
-                <span contenteditable="true" data-path="${key}.${index}.duration">${item.duration}</span>
+                <span style="display:flex; align-items:center;">
+                    <i class="fas fa-calendar-alt" style="margin-right: 4px; font-size: 0.85em;"></i>
+                    <span contenteditable="true" data-path="${key}.${index}.duration">${item.duration}</span>
+                </span>
             </div>
             <div class="exp-sub">
                 <span contenteditable="true" data-path="${key}.${index}.company">${item.company}</span>
-                <span contenteditable="true" data-path="${key}.${index}.location">${item.location}</span>
+                <span style="display:flex; align-items:center;">
+                    <i class="fas fa-map-marker-alt" style="margin-right: 4px; font-size: 0.85em;"></i>
+                    <span contenteditable="true" data-path="${key}.${index}.location">${item.location}</span>
+                </span>
             </div>
             <div class="exp-desc" contenteditable="true" data-path="${key}.${index}.description">${item.description || ''}</div>
             <ul class="exp-bullets">
@@ -335,10 +342,20 @@ function renderEducationEditable(items, container, key) {
     items.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'sidebar-item';
+        // Added icons to location and year
         div.innerHTML = `
             <div class="sidebar-title" contenteditable="true" data-path="${key}.${index}.degree">${item.degree}</div>
             <div class="sidebar-sub"><span contenteditable="true" data-path="${key}.${index}.institution">${item.institution}</span></div>
-            <div class="sidebar-sub sidebar-italic"><span contenteditable="true" data-path="${key}.${index}.location">${item.location}</span><span contenteditable="true" data-path="${key}.${index}.year">${item.year}</span></div>
+            <div class="sidebar-sub sidebar-italic">
+                <span style="display:flex; align-items:center;">
+                    <i class="fas fa-map-marker-alt" style="margin-right: 4px; font-size: 0.85em;"></i>
+                    <span contenteditable="true" data-path="${key}.${index}.location">${item.location}</span>
+                </span>
+                <span style="display:flex; align-items:center;">
+                    <i class="fas fa-calendar-alt" style="margin-right: 4px; font-size: 0.85em;"></i>
+                    <span contenteditable="true" data-path="${key}.${index}.year">${item.year}</span>
+                </span>
+            </div>
             <div class="sidebar-sub"><span contenteditable="true" data-path="${key}.${index}.details">${item.details}</span></div>
         `;
         container.appendChild(div);
@@ -361,11 +378,15 @@ function renderProjectsEditable(items, container, key) {
     items.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'sidebar-item';
+        // Added calendar icon for duration
         div.innerHTML = `
             <div class="sidebar-title" contenteditable="true" data-path="${key}.${index}.title">${item.title}</div>
             <div class="sidebar-sub sidebar-italic">
                 <span contenteditable="true" data-path="${key}.${index}.subtitle">${item.subtitle}</span>
-                <span contenteditable="true" data-path="${key}.${index}.duration">${item.duration}</span>
+                <span style="display:flex; align-items:center;">
+                    <i class="fas fa-calendar-alt" style="margin-right: 4px; font-size: 0.85em;"></i>
+                    <span contenteditable="true" data-path="${key}.${index}.duration">${item.duration}</span>
+                </span>
             </div>
             <div class="sidebar-desc" contenteditable="true" data-path="${key}.${index}.description">${item.description}</div>
             ${item.bullets ? `<ul class="sidebar-bullets">${item.bullets.map((b, bi) => `<li contenteditable="true" data-path="${key}.${index}.bullets.${bi}">${b}</li>`).join('')}</ul>` : ''}
