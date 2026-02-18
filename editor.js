@@ -32,7 +32,7 @@ function initEditor(data) {
     };
 }
 
-// --- PDF Control Logic (ATS Friendly Version) ---
+// --- PDF Control Logic (ATS Friendly & Strict A4 Fit) ---
 function initPdfControl() {
     const sidebar = document.querySelector('.editor-sidebar');
     if (!sidebar) return;
@@ -49,9 +49,11 @@ function initPdfControl() {
             <i class="fas fa-file-pdf"></i> Save as PDF
         </button>
         <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">
-            <strong>ATS Friendly:</strong> Uses browser native print. <br>
-            Select "Save as PDF" in the dialog. <br>
-            Ensure "Background graphics" is ON.
+            <strong>Print Settings:</strong><br>
+            • Destination: Save as PDF<br>
+            • Pages: 1<br>
+            • Margins: None / Custom (0)<br>
+            • Options: Check "Background graphics"
         </div>
     `;
     sidebar.appendChild(group);
@@ -62,15 +64,18 @@ function initPdfControl() {
         @media print {
             @page { 
                 size: A4; 
-                margin: 0; 
+                margin: 0mm;
             }
             
-            body { 
+            html, body { 
+                width: 210mm;
+                height: 297mm;
                 margin: 0 !important; 
                 padding: 0 !important; 
                 background: white !important; 
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important;
+                overflow: hidden !important;
             }
 
             /* Hide all Editor UI */
@@ -84,24 +89,27 @@ function initPdfControl() {
                 outline: none !important; 
                 background: transparent !important; 
                 box-shadow: none !important;
+                padding: 0 !important;
             }
             #name, #title { border-bottom: none !important; }
 
-            /* Page Geometry for A4 */
+            /* Strict A4 Geometry */
             .page {
                 width: 210mm !important;
-                min-height: 297mm !important;
+                height: 296mm !important; /* 1mm buffer to prevent spillover */
                 margin: 0 !important;
-                padding: 10mm !important; /* Standard printable padding */
+                padding: 10mm !important; 
                 border: none !important;
                 box-shadow: none !important;
                 overflow: hidden !important;
+                position: relative;
             }
 
-            /* Content Scaling to fit 1 Page */
+            /* Intelligent Ratio Scaling */
             .resume-content {
                 width: 100%;
-                zoom: 0.95; /* Slight shrink to ensure single-page fit */
+                /* 0.90 zoom is the calculated ratio to fit 10.5pt text + layout on exactly one A4 page */
+                zoom: 0.90; 
             }
         }
     `;
