@@ -93,16 +93,27 @@ function initPdfControl() {
             }
             #name, #title { border-bottom: none !important; }
 
-            /* Strict A4 Geometry */
+            /* Strict A4 Geometry - Optimized for Vertical Balance */
             .page {
                 width: 210mm !important;
                 height: 296mm !important; /* 1mm buffer to prevent spillover */
                 margin: 0 !important;
-                padding: 10mm !important; 
+                /* Reduced top/bottom padding to 6mm to move content up and balance space */
+                padding: 6mm 10mm 6mm 10mm !important; 
                 border: none !important;
                 box-shadow: none !important;
                 overflow: hidden !important;
                 position: relative;
+            }
+
+            /* Optimize Spacing Between Sections */
+            .section {
+                margin-bottom: 10px !important; /* Compact spacing */
+            }
+            
+            /* Adjust Header Spacing */
+            .resume-header {
+                margin-bottom: 12px !important;
             }
 
             /* Intelligent Ratio Scaling */
