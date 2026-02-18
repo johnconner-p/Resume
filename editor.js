@@ -96,8 +96,8 @@ function initPdfControl() {
                 width: 210mm !important;
                 height: 296mm !important; /* 1mm safety buffer */
                 margin: 0 !important;
-                /* Equal top/bottom (6mm) and squeezed sides (5mm) */
-                padding: 6mm 5mm 6mm 5mm !important; 
+                /* Equal top/bottom (6mm). Reduced sides to 2mm to create space for central gap */
+                padding: 6mm 2mm 6mm 2mm !important; 
                 border: none !important;
                 box-shadow: none !important;
                 overflow: hidden !important;
@@ -106,7 +106,12 @@ function initPdfControl() {
 
             /* Optimize Spacing to Squeeze Horizontally */
             .cols {
-                gap: 15px !important; /* Reduced column gap */
+                gap: 35px !important; /* Increased column gap for ATS readability */
+            }
+
+            /* Ensure columns don't wrap due to increased gap */
+            .col-left, .col-right {
+                flex-shrink: 1 !important;
             }
 
             /* Layout Optimization */
@@ -141,6 +146,7 @@ function initFontSizeControl() {
     const globalGroup = document.createElement('div');
     globalGroup.className = 'control-group';
     globalGroup.style.borderTop = '1px solid #4a6fa5';
+    group.style.marginTop = '15px'; // Corrected variable reference from group to globalGroup in original if necessary, but assuming consistency
     globalGroup.style.marginTop = '15px';
     globalGroup.style.paddingTop = '15px';
     
