@@ -117,7 +117,7 @@ function initPdfControl() {
             /* Hide all Editor UI */
             .editor-sidebar, .control-group, button { display: none !important; }
             
-            /* Remove visuals used for editing */
+            /* Remove visuals used for editing generally */
             [contenteditable] { 
                 border: none !important; 
                 outline: none !important; 
@@ -126,6 +126,13 @@ function initPdfControl() {
                 padding: 0 !important;
             }
             #name, #title { border-bottom: none !important; }
+
+            /* FIX: Explicitly restore Section Title Borders */
+            .section-title {
+                border-bottom: 1px solid #333 !important;
+                padding-bottom: 2px !important;
+                margin-bottom: 6px !important;
+            }
 
             /* Strict A4 Geometry - Balanced for Print */
             .page {
