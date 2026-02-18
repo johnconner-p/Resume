@@ -1,6 +1,7 @@
 let globalData = {};
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Load Data
     fetch('resume.json')
         .then(response => response.json())
         .then(data => {
@@ -11,36 +12,27 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initEditor(data) {
-    // 1. Render sidebar lists for reordering
     renderSortableLists(data.settings.layout);
-
-    // 2. Render the Visual Resume
     renderResumeEditable(data);
-
-    // 3. Init Font Size Control
     initFontSizeControl();
-
-    // 4. Init PDF Export Control (NEW)
-    initPdfControl();
+    initPdfControl(); 
     
-    // 5. Apply saved font scale if it exists
     if (data.settings.fontScale) {
         updateFontScale(data.settings.fontScale);
         const slider = document.querySelector('input[type="range"]');
         if (slider) slider.value = data.settings.fontScale;
     }
 
-    // 6. Expose helper functions for buttons
     window.addBullet = function(key, index) {
         if (globalData[key] && globalData[key][index]) {
             if (!globalData[key][index].bullets) globalData[key][index].bullets = [];
             globalData[key][index].bullets.push("New bullet");
-            renderResumeEditable(globalData); // Re-render to show new bullet
+            renderResumeEditable(globalData);
         }
     };
 }
 
-// --- PDF Control Logic (NEW) ---
+// --- PDF Control Logic (ATS Friendly Version) ---
 function initPdfControl() {
     const sidebar = document.querySelector('.editor-sidebar');
     if (!sidebar) return;
@@ -52,44 +44,75 @@ function initPdfControl() {
     group.style.paddingTop = '15px';
 
     group.innerHTML = `
-        <span class="control-label">Export Resume</span>
+        <span class="control-label">Export</span>
         <button onclick="window.print()" class="btn btn-danger">
-            <i class="fas fa-file-pdf"></i> Download PDF
+            <i class="fas fa-file-pdf"></i> Save as PDF
         </button>
         <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">
-            Click to open print dialog. Choose "Save as PDF".
+            <strong>ATS Friendly:</strong> Uses browser native print. <br>
+            Select "Save as PDF" in the dialog. <br>
+            Ensure "Background graphics" is ON.
         </div>
     `;
     sidebar.appendChild(group);
 
-    // Inject Print Styles to hide UI elements
+    // Inject Print Styles to CLEAN UP the interface for PDF
     const style = document.createElement('style');
     style.innerHTML = `
         @media print {
-            /* Hide Interface */
-            .editor-sidebar, .format-toolbar { display: none !important; }
+            @page { 
+                size: A4; 
+                margin: 0; 
+            }
             
-            /* Reset Page for Print */
-            body { padding: 0 !important; background: white !important; -webkit-print-color-adjust: exact; }
-            .page { box-shadow: none !important; margin: 0 !important; width: 100% !important; border: none !important; }
+            body { 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                background: white !important; 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important;
+            }
+
+            /* Hide all Editor UI */
+            .editor-sidebar { display: none !important; }
+            .control-group { display: none !important; }
+            button { display: none !important; } /* Hides Add Bullet buttons */
             
-            /* Hide the Add Bullet buttons and any other buttons in the content */
-            button { display: none !important; } 
-            
-            /* Clean up Editable Areas */
-            [contenteditable] { border: none !important; outline: none !important; background: transparent !important; } 
+            /* Remove visuals used for editing */
+            [contenteditable] { 
+                border: none !important; 
+                outline: none !important; 
+                background: transparent !important; 
+                box-shadow: none !important;
+            }
             #name, #title { border-bottom: none !important; }
+
+            /* Page Geometry for A4 */
+            .page {
+                width: 210mm !important;
+                min-height: 297mm !important;
+                margin: 0 !important;
+                padding: 10mm !important; /* Standard printable padding */
+                border: none !important;
+                box-shadow: none !important;
+                overflow: hidden !important;
+            }
+
+            /* Content Scaling to fit 1 Page */
+            .resume-content {
+                width: 100%;
+                zoom: 0.95; /* Slight shrink to ensure single-page fit */
+            }
         }
     `;
     document.head.appendChild(style);
 }
 
-// --- Font Size Control Logic ---
+// --- Font Size Control ---
 function initFontSizeControl() {
     const sidebar = document.querySelector('.editor-sidebar');
     if (!sidebar) return;
 
-    // 1. Global Scale Control
     const globalGroup = document.createElement('div');
     globalGroup.className = 'control-group';
     globalGroup.style.borderTop = '1px solid #4a6fa5';
@@ -105,7 +128,6 @@ function initFontSizeControl() {
     `;
     sidebar.appendChild(globalGroup);
 
-    // 2. Specific Selection Size Control
     const selectionGroup = document.createElement('div');
     selectionGroup.className = 'control-group';
     selectionGroup.style.borderTop = '1px solid #4a6fa5';
@@ -130,7 +152,6 @@ window.updateFontScale = function(scale) {
 
     const styleId = 'dynamic-font-scale';
     let styleTag = document.getElementById(styleId);
-    
     if (!styleTag) {
         styleTag = document.createElement('style');
         styleTag.id = styleId;
@@ -187,14 +208,14 @@ window.applySelectionFontSize = function() {
             selection.removeAllRanges();
         } catch (e) {
             console.error("Could not apply font size", e);
-            alert("Could not apply style. Ensure you are selecting text within a single section.");
+            alert("Could not apply style.");
         }
     } else {
         alert('Please select some text first.');
     }
 };
 
-/* --- RENDERERS (With ContentEditable) --- */
+/* --- RENDERERS --- */
 function renderResumeEditable(data) {
     const nameEl = document.getElementById('name');
     nameEl.innerHTML = data.profile.name; 
@@ -370,7 +391,6 @@ function attachLiveUpdaters() {
                 ref = ref[path[i]];
             }
             ref[path[path.length - 1]] = value;
-            console.log('Updated:', path.join('.'), value);
         });
     });
 }
