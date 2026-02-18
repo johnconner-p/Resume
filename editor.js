@@ -32,7 +32,7 @@ function initEditor(data) {
     };
 }
 
-// --- PDF Control Logic (ATS Friendly & Strict A4 Fit) ---
+// --- PDF Control Logic (Optimized for Microsoft Print to PDF) ---
 function initPdfControl() {
     const sidebar = document.querySelector('.editor-sidebar');
     if (!sidebar) return;
@@ -49,11 +49,11 @@ function initPdfControl() {
             <i class="fas fa-file-pdf"></i> Save as PDF
         </button>
         <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">
-            <strong>Print Settings:</strong><br>
-            • Destination: Save as PDF<br>
-            • Pages: 1<br>
-            • Margins: None / Custom (0)<br>
-            • Options: Check "Background graphics"
+            <strong>Microsoft Print to PDF:</strong><br>
+            • Paper Size: A4 (Important)<br>
+            • Margins: None<br>
+            • Scale: 100 (Code handles fit)<br>
+            • Graphics: Check "Background graphics"
         </div>
     `;
     sidebar.appendChild(group);
@@ -75,13 +75,11 @@ function initPdfControl() {
                 background: white !important; 
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important;
-                overflow: hidden !important;
+                overflow: hidden !important; /* Prevents 2nd page spillover */
             }
 
             /* Hide all Editor UI */
-            .editor-sidebar { display: none !important; }
-            .control-group { display: none !important; }
-            button { display: none !important; } /* Hides Add Bullet buttons */
+            .editor-sidebar, .control-group, button { display: none !important; }
             
             /* Remove visuals used for editing */
             [contenteditable] { 
@@ -93,34 +91,37 @@ function initPdfControl() {
             }
             #name, #title { border-bottom: none !important; }
 
-            /* Strict A4 Geometry - Optimized for Vertical Balance */
+            /* Strict A4 Geometry - Balanced for Print */
             .page {
                 width: 210mm !important;
-                height: 296mm !important; /* 1mm buffer to prevent spillover */
+                height: 296mm !important; /* 1mm safety buffer */
                 margin: 0 !important;
-                /* Reduced top/bottom padding to 6mm to move content up and balance space */
-                padding: 6mm 10mm 6mm 10mm !important; 
+                /* 8mm padding provides a clean safe area without wasting space */
+                padding: 8mm 10mm 8mm 10mm !important; 
                 border: none !important;
                 box-shadow: none !important;
                 overflow: hidden !important;
                 position: relative;
             }
 
-            /* Optimize Spacing Between Sections */
-            .section {
-                margin-bottom: 10px !important; /* Compact spacing */
-            }
-            
-            /* Adjust Header Spacing */
-            .resume-header {
-                margin-bottom: 12px !important;
-            }
-
-            /* Intelligent Ratio Scaling */
+            /* Layout Optimization */
             .resume-content {
                 width: 100%;
-                /* 0.90 zoom is the calculated ratio to fit 10.5pt text + layout on exactly one A4 page */
-                zoom: 0.90; 
+                /* 0.92 zoom allows standard font sizes to fit perfectly on A4 */
+                zoom: 0.92; 
+            }
+
+            /* Refined Spacing for Density */
+            .resume-header { margin-bottom: 12px !important; }
+            .section { margin-bottom: 10px !important; }
+            .exp-item, .sidebar-item { margin-bottom: 6px !important; } /* Tighter item spacing */
+            
+            /* Text Flow Optimization */
+            p, li, .exp-desc, .sidebar-desc { 
+                line-height: 1.35 !important; 
+            }
+            ul.exp-bullets, ul.sidebar-bullets {
+                margin-bottom: 2px !important;
             }
         }
     `;
