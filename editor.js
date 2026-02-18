@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initEditor(data) {
+    // Ensure JSON download button exists
+    initJsonControl();
+
     renderSortableLists(data.settings.layout);
     renderResumeEditable(data);
     initFontSizeControl();
@@ -30,6 +33,39 @@ function initEditor(data) {
             renderResumeEditable(globalData);
         }
     };
+}
+
+// --- JSON Download Control (Restored) ---
+function initJsonControl() {
+    const sidebar = document.querySelector('.editor-sidebar');
+    if (!sidebar) return;
+
+    // Check if button already exists to avoid duplicates
+    if (document.querySelector('button[onclick="downloadJson()"]')) return;
+
+    const group = document.createElement('div');
+    group.className = 'control-group';
+    group.style.borderBottom = '1px solid #4a6fa5';
+    group.style.marginBottom = '15px';
+    group.style.paddingBottom = '15px';
+
+    group.innerHTML = `
+        <span class="control-label">Data</span>
+        <button onclick="downloadJson()" class="btn btn-success">
+            <i class="fas fa-download"></i> Download JSON
+        </button>
+        <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">
+            Save changes to upload to GitHub.
+        </div>
+    `;
+
+    // Insert after the title if possible
+    const title = sidebar.querySelector('h2');
+    if (title && title.nextSibling) {
+        sidebar.insertBefore(group, title.nextSibling);
+    } else {
+        sidebar.prepend(group);
+    }
 }
 
 // --- PDF Control Logic (Optimized for Microsoft Print to PDF) ---
@@ -146,7 +182,6 @@ function initFontSizeControl() {
     const globalGroup = document.createElement('div');
     globalGroup.className = 'control-group';
     globalGroup.style.borderTop = '1px solid #4a6fa5';
-    group.style.marginTop = '15px'; // Corrected variable reference from group to globalGroup in original if necessary, but assuming consistency
     globalGroup.style.marginTop = '15px';
     globalGroup.style.paddingTop = '15px';
     
@@ -318,7 +353,6 @@ function renderExperienceEditable(items, container, key) {
     items.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'exp-item';
-        // Added calendar icon for duration and map marker for location
         div.innerHTML = `
             <div class="exp-header">
                 <span contenteditable="true" data-path="${key}.${index}.role">${item.role}</span>
@@ -348,7 +382,6 @@ function renderEducationEditable(items, container, key) {
     items.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'sidebar-item';
-        // Added icons to location and year
         div.innerHTML = `
             <div class="sidebar-title" contenteditable="true" data-path="${key}.${index}.degree">${item.degree}</div>
             <div class="sidebar-sub"><span contenteditable="true" data-path="${key}.${index}.institution">${item.institution}</span></div>
@@ -384,7 +417,6 @@ function renderProjectsEditable(items, container, key) {
     items.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'sidebar-item';
-        // Added calendar icon for duration
         div.innerHTML = `
             <div class="sidebar-title" contenteditable="true" data-path="${key}.${index}.title">${item.title}</div>
             <div class="sidebar-sub sidebar-italic">
