@@ -96,12 +96,17 @@ function initPdfControl() {
                 width: 210mm !important;
                 height: 296mm !important; /* 1mm safety buffer */
                 margin: 0 !important;
-                /* 8mm padding provides a clean safe area without wasting space */
-                padding: 8mm 10mm 8mm 10mm !important; 
+                /* Equal top/bottom (6mm) and squeezed sides (5mm) */
+                padding: 6mm 5mm 6mm 5mm !important; 
                 border: none !important;
                 box-shadow: none !important;
                 overflow: hidden !important;
                 position: relative;
+            }
+
+            /* Optimize Spacing to Squeeze Horizontally */
+            .cols {
+                gap: 15px !important; /* Reduced column gap */
             }
 
             /* Layout Optimization */
