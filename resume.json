@@ -1,16 +1,8 @@
 {
     "settings": {
         "layout": {
-            "left": [
-                "summary",
-                "experience",
-                "education"
-            ],
-            "right": [
-                "skills",
-                "projects",
-                "engagements"
-            ]
+            "left": ["summary", "experience"],
+            "right": ["education", "skills", "projects", "engagements"]
         },
         "titles": {
             "summary": "SUMMARY",
@@ -23,28 +15,28 @@
     },
     "profile": {
         "name": "PIYUSH RAI",
-        "title": "<span style=\"font-size: 11pt;\">Product Manager | Fintech &amp; AI/ML | Digital Transformation &amp; Data-Driven Strategy</span>",
+        "title": "Product Manager | Fintech & AI/ML | Digital Transformation & Data-Driven Strategy",
         "phone": "+91 6005044517",
         "email": "piyush07rai@gmail.com",
         "linkedin": "https://linkedin.com/in/piyush07rai"
     },
-    "summary": "<span style=\"font-size: 10pt;\">Product Manager with 4 years of experience building scalable, API-driven platforms in complex enterprise environments. Led legacy modernization and distributed system initiatives by defining clear product strategies, prioritizing high-impact trade-offs, and improving reliability and adoption through measurable outcomes. Known for structuring ambiguous problems into scalable solutions that balance technical feasibility, user needs, and business impact.</span>",
+    "summary": "Product Management professional with 3.5+ years of experience driving digital transformation in the Banking and Financial Services sector. Proven success in building and scaling API-led digital products that reduced onboarding time by 80%, lowered transaction fallout rates by 70%, and increased client adoption by 30% YoY. Adept at defining product strategy, managing cross-functional delivery, and implementing KPI-driven decision frameworks. Skilled in leading end-to-end product strategy from ideation to execution, leveraging data, automation, and agile methodologies to enhance client experience and operational efficiency.",
     "experience": [
         {
             "role": "Product Manager - II",
             "company": "ICICI Bank",
             "location": "Mumbai, India",
             "duration": "06/2022 - Present",
-            "description": "<p data-start=\"717\" data-end=\"872\"><span style=\"font-size: 10pt;\"><span style=\"font-size: 10pt;\">Define and drive product strategy for enterprise-grade API infrastructure supporting high-volume &amp; distributed workflows&nbsp;</span></span></p>",
+            "description": "Part of the Transaction Banking Group, catering to cash management requirements of corporates through invisible banking (APIs)",
             "bullets": [
-                "Architected a Unified Digital Payments Platform, consolidating 5+ legacy systems into a microservices-based orchestration layer, enabling headless API initiation for clients. Includes channels like UPI, NEFT, RTGS etc.",
-                "Built and scaled a self-service API Developer Portal, reducing Time-to-First-Call from 1–2 weeks to <4 hours and driving 30% YoY growth in API-led client adoption.",
-                "Led legacy gateway decommissioning, migrating 800+ enterprise clients from SOAP-based infrastructure to RESTful APIs within 3 quarters, achieving zero downtime and full data integrity during transition.",
-                "Designed and rolled out real-time transaction monitoring dashboards, leveraging data-driven anomaly detection to enable faster root-cause analysis and reducing client complaints by 6% MoM.",
-                "Engineered a predictive transaction health framework (intelligent polling & anomaly detection), reducing transaction fallout rates by 70% and strengthening payment success metrics during partner bank downtimes.",
-                "Launched a DIY H2H onboarding platform (HTTPS/SFTP-based STP file transfers), enabling secure, scalable integrations for Bulk Payments.",
-                "Conceptualised and implemented an API monetisation engine (\"Charge Master\"), shifting from static pricing to volume-based tiering — unlocking new revenue streams and improving pricing transparency.",
-                "Created ROI models for strategic Products, using forecasting models and KPI benchmarking to drive data-driven investment decisions for new Projects.",
+                "Led the digital cash management transformation program, building a unified Platform for Digital Payments & Collections (UPI, RTGS, NEFT, API-based initiation), consolidating multiple legacy systems into a microservices-based architecture.",
+                "Developed and launched self-service developer's portal for API onboarding, cutting onboarding time from 1 to 2 weeks to 3-4 hours and driving 30% YoY increase in client adoption.",
+                "Spearheaded migration of 800+ Corporate clients from legacy API gateway, decommissioning outdated infrastructure within 3 quarters with zero disruptions.",
+                "Designed and rolled out real-time transaction monitoring dashboard, leveraging data-driven anomaly detection to enable faster root-cause analysis and reducing client complaints by 6% MoM.",
+                "Built a polling mechanism for outbound APIs, lowering fallout rates by 70% through predictive transaction health checks.",
+                "Launched DIY mode client onboarding platform for HTTPS and SFTP-based H2H services for corporate clients, ensuring secure and scalable STP file transfer processes.",
+                "Built an API monetization framework (Charge Master), aligning pricing with business goals and creating new revenue opportunities.",
+                "Created ROI models for strategic Products, using forecasting models and KPI benchmarking to drive data-driven investment decisions.",
                 "Partnered with a 2,000+ member business team to analyse sales trends, client data, and adoption metrics, directly shaping the product roadmap and GTM strategy."
             ]
         },
@@ -55,9 +47,8 @@
             "duration": "03/2022 - 06/2022",
             "description": "Tech company offering engineering simulation software.",
             "bullets": [
-                "Debugged and optimized performance-critical C++ modules within the HyperWorks simulation engine, improving runtime stability and reducing recurring defect cycles across production builds.",
-                "Built Python automation scripts to identify and refactor 200+ deprecated command patterns, accelerating version upgrades and ensuring backward compatibility across enterprise customer environments.",
-                "Contributed to a shared production codebase using Perforce version control within a 10-member engineering team, participating in structured code reviews and release management processes."
+                "Debugged and optimized C++ source code modules in Hyperworks, improving reliability and system performance.",
+                "Automated identification of 200+ deprecated Hyperworks commands with Python, accelerating updates and ensuring seamless functionality. Collaborated within a 10-member team using Perforce version control, streamlining code management and ensuring milestone alignment."
             ]
         }
     ],
@@ -67,25 +58,25 @@
             "institution": "Indian Institute of Technology Jammu",
             "location": "Jammu, India",
             "year": "08/2018 - 05/2022",
-            "details": "<span style=\"font-size: 10pt;\">CGPA 7.73/10</span>"
+            "details": "CGPA 7.73/10"
         }
     ],
     "skills": [
         {
-            "category": "Product & Strategy",
-            "items": "<span style=\"font-size: 10pt;\">Product Roadmapping, Go to Market Strategy, KPIs Definition, A/B Testing, Market &amp; User Research, RCA</span>"
+            "category": "Product Strategy & Management",
+            "items": "Product Roadmapping, Go to Market Strategy, KPIs Tracking, A/B Testing, Market & User Research"
         },
         {
-            "category": "Platform & API",
-            "items": "<span style=\"font-size: 10pt;\">API Lifecycle Management, RESTful API Design, Webhooks vs Polling, Idempotency Concepts, API Versioning, Microservices Architecture, System Design Fundamentals</span>"
+            "category": "Agile & Delivery Management",
+            "items": "Sprint Planning, Scrum & Kanban, UAT management, Release Planning, Continuous Improvement"
         },
         {
-            "category": "Data & Observability",
-            "items": "<span style=\"font-size: 10pt;\">SQL, Excel, Funnel Analysis, Dashboarding (Power BI), Forecast Modeling, Adoption &amp; Retention Metrics</span>"
+            "category": "Tools & APIs",
+            "items": "SQL, Excel, Power BI, Figma, Python, Postman, Swagger, Confluence, REST APIs, Bulk APIs, AI/ML Fundamentals, JIRA"
         },
         {
-            "category": "Technical Foundation",
-            "items": "<span style=\"font-size: 10pt;\">Python, C++, JSON, OpenAPI/Swagger, Postman, Git/Perforce, Agile/Sc<span style=\"font-size: 10pt;\"></span>rum, AI Tools</span>"
+            "category": "Certifications",
+            "items": "API & Microservices, DevOps, Cloud Computing, Project Management - Agile & Scrum methodologies"
         }
     ],
     "projects": [
@@ -117,7 +108,7 @@
         },
         {
             "title": "Community Involvement and Leadership",
-            "description": "• Volunteer teacher for Senior Secondary Mathematics at Angelxpress NGO&nbsp;<div>• IIT Jammu Basketball Team Captain (2019-2022) &amp; Inter-IIT Sports Meet 2019</div>"
+            "description": "• Volunteer teacher for Senior Secondary Mathematics at Angelxpress NGO\n• IIT Jammu Basketball Team Captain (2019-2022) & Inter-IIT Sports Meet 2019"
         }
     ]
 }

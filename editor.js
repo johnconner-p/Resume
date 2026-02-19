@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initEditor(data) {
     initJsonControl();
-    initWordControl(); // New Word Export
+    // Word Export Removed per requirements
     initPdfControl();
     initFontSizeControl();
 
@@ -78,34 +78,6 @@ function initJsonControl() {
     }
 }
 
-// --- Word Export Control (NEW) ---
-function initWordControl() {
-    const sidebar = document.querySelector('.editor-sidebar');
-    if (!sidebar) return;
-
-    const group = document.createElement('div');
-    group.className = 'control-group';
-    group.style.marginTop = '15px';
-
-    group.innerHTML = `
-        <span class="control-label">Word Document</span>
-        <button onclick="downloadWord()" class="btn" style="background: #2b579a; color: white;">
-            <i class="fas fa-file-word"></i> Export to Word
-        </button>
-        <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">
-            Downloads a .doc file editable in MS Word.
-        </div>
-    `;
-    
-    // Insert before PDF control if possible, or append
-    const existing = sidebar.querySelectorAll('.control-group');
-    if(existing.length > 1) {
-        sidebar.insertBefore(group, existing[existing.length - 1]); // Insert before PDF
-    } else {
-        sidebar.appendChild(group);
-    }
-}
-
 // --- PDF Control (ATS Friendly + System Fonts) ---
 function initPdfControl() {
     const sidebar = document.querySelector('.editor-sidebar');
@@ -127,61 +99,8 @@ function initPdfControl() {
         </div>
     `;
     sidebar.appendChild(group);
-
-    // Inject Print CSS
-    const style = document.createElement('style');
-    style.innerHTML = `
-        @media print {
-            @page { size: A4; margin: 0mm; }
-            
-            html, body { 
-                width: 210mm; height: 297mm; margin: 0 !important; padding: 0 !important; 
-                background: white !important; -webkit-print-color-adjust: exact !important; 
-                print-color-adjust: exact !important; overflow: hidden !important;
-                /* FORCE SYSTEM FONT FOR SHARP TEXT (Fixes 'I' vs 'l' issue) */
-                font-family: Arial, Helvetica, sans-serif !important; 
-            }
-
-            .editor-sidebar, .control-group, button { display: none !important; }
-            
-            [contenteditable] { 
-                border: none !important; outline: none !important; 
-                background: transparent !important; padding: 0 !important;
-            }
-
-            .section-title {
-                border-bottom: 1px solid #333 !important;
-                padding-bottom: 2px !important; margin-bottom: 6px !important;
-                display: block !important;
-            }
-
-            .page {
-                width: 210mm !important; height: 296mm !important; margin: 0 !important;
-                padding: 6mm 2mm 6mm 2mm !important; 
-                border: none !important; box-shadow: none !important;
-                position: relative;
-            }
-
-            .cols { gap: 35px !important; }
-            .col-left, .col-right { flex-shrink: 1 !important; }
-            
-            /* Ensure text is pure vector black */
-            body, h1, h2, h3, p, span, li, div { 
-                color: #000 !important; 
-                text-shadow: none !important; 
-            }
-            /* Exception for muted text if needed, but keeping it dark for ATS */
-            .contact-info, .exp-desc, .sidebar-desc { color: #333 !important; }
-
-            .resume-content { width: 100%; zoom: 0.92; }
-            .resume-header { margin-bottom: 12px !important; }
-            .section { margin-bottom: 10px !important; }
-            .exp-item, .sidebar-item { margin-bottom: 6px !important; }
-            p, li, .exp-desc, .sidebar-desc { line-height: 1.35 !important; }
-            ul.exp-bullets, ul.sidebar-bullets { margin-bottom: 2px !important; }
-        }
-    `;
-    document.head.appendChild(style);
+    
+    // NOTE: Strict Print CSS is now handled in style.css to ensure consistency
 }
 
 // --- Font Size Control ---
@@ -219,34 +138,6 @@ function initFontSizeControl() {
         <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">Highlight text, set size, click Apply.</div>
     `;
     sidebar.appendChild(selectionGroup);
-}
-
-// --- Word Export Logic ---
-function downloadWord() {
-    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
-        "xmlns:w='urn:schemas-microsoft-com:office:word' " +
-        "xmlns='http://www.w3.org/TR/REC-html40'>" +
-        "<head><meta charset='utf-8'><title>Resume</title></head><body>";
-    
-    const footer = "</body></html>";
-    
-    // Clone the resume content to clean it up
-    const content = document.getElementById('resume-container').cloneNode(true);
-    
-    // Clean up content for Word
-    content.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
-    content.querySelectorAll('button').forEach(el => el.remove());
-    
-    // Convert to string
-    const sourceHTML = header + content.innerHTML + footer;
-    
-    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
-    const fileDownload = document.createElement("a");
-    document.body.appendChild(fileDownload);
-    fileDownload.href = source;
-    fileDownload.download = 'resume.doc';
-    fileDownload.click();
-    document.body.removeChild(fileDownload);
 }
 
 // --- Updates (Font Scale, Text Selection, Titles) ---

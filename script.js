@@ -3,9 +3,34 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             renderResume(data);
+            if (data.settings && data.settings.fontScale) {
+                applyFontScale(data.settings.fontScale);
+            }
         })
         .catch(error => console.error('Error loading resume data:', error));
 });
+
+function applyFontScale(scale) {
+    const styleId = 'dynamic-font-scale';
+    let styleTag = document.getElementById(styleId);
+    if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = styleId;
+        document.head.appendChild(styleTag);
+    }
+    styleTag.innerHTML = `
+        body { font-size: ${10.5 * scale}pt !important; }
+        .resume-header h1 { font-size: ${24 * scale}pt !important; }
+        .resume-header h2 { font-size: ${10 * scale}pt !important; }
+        .section-title { font-size: ${11 * scale}pt !important; }
+        .exp-header { font-size: ${10.5 * scale}pt !important; }
+        .sidebar-title { font-size: ${10.5 * scale}pt !important; }
+        .exp-desc, .sidebar-desc, .skill-list, li { font-size: ${10 * scale}pt !important; }
+        .exp-sub, .sidebar-sub { font-size: ${10 * scale}pt !important; }
+        .contact-row { font-size: ${9 * scale}pt !important; }
+        .contact-row i { font-size: ${10 * scale}pt !important; }
+    `;
+}
 
 function renderResume(data) {
     // 1. Render Header
@@ -48,24 +73,40 @@ function renderSection(key, data, container) {
 }
 
 function renderHeader(profile) {
-    document.getElementById('name').textContent = profile.name;
-    document.getElementById('title').textContent = profile.title;
+    document.getElementById('name').innerHTML = profile.name;
+    document.getElementById('title').innerHTML = profile.title;
     
+    // Updated Layout: Side-by-side contact info, icons first
     const contactHtml = `
-        <div class="contact-row">
-            <span>${profile.phone}</span>
-            <i class="fas fa-phone-alt"></i>
+        <div class="contact-row" style="display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-phone-alt" style="font-size: 0.9em;"></i>
+            <span>${profile.phone}</span> 
         </div>
-        <div class="contact-row">
-            <a href="mailto:${profile.email}">${profile.email}</a>
-            <i class="fas fa-envelope"></i>
+        <div class="contact-row" style="display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-envelope" style="font-size: 0.9em;"></i>
+            <span>${profile.email}</span> 
         </div>
-        <div class="contact-row">
-            <a href="${profile.linkedin}" target="_blank">linkedin.com/in/piyush07rai</a>
-            <i class="fab fa-linkedin"></i>
+        <div class="contact-row" style="display: flex; align-items: center; gap: 6px;">
+            <i class="fab fa-linkedin" style="font-size: 0.9em;"></i>
+            <span>${profile.linkedin}</span> 
         </div>
     `;
-    document.getElementById('contact').innerHTML = contactHtml;
+    
+    const contactDiv = document.getElementById('contact');
+    contactDiv.innerHTML = contactHtml;
+
+    // Apply the structural fix (Move contact info below name/title)
+    const headerLeft = document.querySelector('.header-left');
+    if (headerLeft && contactDiv && contactDiv.parentElement !== headerLeft) {
+        headerLeft.appendChild(contactDiv);
+        contactDiv.style.textAlign = 'left';
+        contactDiv.style.marginTop = '8px';
+        contactDiv.style.display = 'flex';
+        contactDiv.style.flexWrap = 'wrap';
+        contactDiv.style.gap = '15px';
+        contactDiv.style.alignItems = 'center';
+        contactDiv.classList.remove('header-right');
+    }
 }
 
 function renderSummary(summary, container) {
