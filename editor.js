@@ -12,36 +12,37 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initEditor(data) {
-    // Ensure JSON download button exists
+    // Ensure controls exist
     initJsonControl();
+    initPdfControl();
+    initFontSizeControl();
 
+    // Render content
     renderSortableLists(data.settings.layout);
     renderResumeEditable(data);
-    initFontSizeControl();
-    initPdfControl(); 
     
+    // Apply saved font preference
     if (data.settings.fontScale) {
         updateFontScale(data.settings.fontScale);
         const slider = document.querySelector('input[type="range"]');
         if (slider) slider.value = data.settings.fontScale;
     }
 
-    // --- ATS FIX: Convert to static text before printing ---
+    // --- ATS OPTIMIZATION: Clean Text Mode ---
+    // This ensures the PDF generator sees RAW TEXT, not "input fields"
     window.addEventListener('beforeprint', () => {
-        // Remove editability to ensure printer sees plain text, not form fields
         document.querySelectorAll('[contenteditable]').forEach(el => {
             el.removeAttribute('contenteditable');
         });
-        // Remove inline visual cues (dashed borders) temporarily
-        document.getElementById('name').style.borderBottom = 'none';
-        document.getElementById('title').style.borderBottom = 'none';
+        // Remove editing visual cues
+        if(document.getElementById('name')) document.getElementById('name').style.borderBottom = 'none';
+        if(document.getElementById('title')) document.getElementById('title').style.borderBottom = 'none';
     });
 
+    // Restore editing capability after print dialog closes
     window.addEventListener('afterprint', () => {
-        // Restore editor state immediately after print dialog closes
         renderResumeEditable(globalData);
     });
-    // -------------------------------------------------------
 
     window.addBullet = function(key, index) {
         if (globalData[key] && globalData[key][index]) {
@@ -52,12 +53,10 @@ function initEditor(data) {
     };
 }
 
-// --- JSON Download Control (Restored) ---
+// --- JSON Download Control ---
 function initJsonControl() {
     const sidebar = document.querySelector('.editor-sidebar');
     if (!sidebar) return;
-
-    // Check if button already exists to avoid duplicates
     if (document.querySelector('button[onclick="downloadJson()"]')) return;
 
     const group = document.createElement('div');
@@ -76,7 +75,6 @@ function initJsonControl() {
         </div>
     `;
 
-    // Insert after the title if possible
     const title = sidebar.querySelector('h2');
     if (title && title.nextSibling) {
         sidebar.insertBefore(group, title.nextSibling);
@@ -85,7 +83,7 @@ function initJsonControl() {
     }
 }
 
-// --- PDF Control Logic (Optimized for Microsoft Print to PDF) ---
+// --- PDF Control (ATS Friendly) ---
 function initPdfControl() {
     const sidebar = document.querySelector('.editor-sidebar');
     if (!sidebar) return;
@@ -102,16 +100,16 @@ function initPdfControl() {
             <i class="fas fa-file-pdf"></i> Save as PDF
         </button>
         <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">
-            <strong>Microsoft Print to PDF:</strong><br>
-            • Paper Size: A4 (Important)<br>
+            <strong>Print Settings:</strong><br>
+            • Destination: Save as PDF<br>
+            • Paper Size: A4<br>
             • Margins: None<br>
-            • Scale: 100 (Code handles fit)<br>
-            • Graphics: Check "Background graphics"
+            • Options: Check "Background graphics"
         </div>
     `;
     sidebar.appendChild(group);
 
-    // Inject Print Styles to CLEAN UP the interface for PDF
+    // Inject Print CSS
     const style = document.createElement('style');
     style.innerHTML = `
         @media print {
@@ -128,71 +126,50 @@ function initPdfControl() {
                 background: white !important; 
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important;
-                overflow: hidden !important; /* Prevents 2nd page spillover */
+                overflow: hidden !important;
             }
 
-            /* Hide all Editor UI */
+            /* Hide Editor UI */
             .editor-sidebar, .control-group, button { display: none !important; }
             
-            /* Remove visuals used for editing generally */
+            /* Clean Text for ATS */
             [contenteditable] { 
                 border: none !important; 
                 outline: none !important; 
                 background: transparent !important; 
-                box-shadow: none !important;
                 padding: 0 !important;
             }
-            #name, #title { border-bottom: none !important; }
 
-            /* FIX: Explicitly restore Section Title Borders */
+            /* FORCE VISIBLE LINES (Section Divider Fix) */
             .section-title {
                 border-bottom: 1px solid #333 !important;
                 padding-bottom: 2px !important;
                 margin-bottom: 6px !important;
+                display: block !important; /* Ensures it takes up space */
             }
 
-            /* Strict A4 Geometry - Balanced for Print */
+            /* A4 Geometry */
             .page {
                 width: 210mm !important;
-                height: 296mm !important; /* 1mm safety buffer */
+                height: 296mm !important;
                 margin: 0 !important;
-                /* Equal top/bottom (6mm). Reduced sides to 2mm to create space for central gap */
-                padding: 6mm 2mm 6mm 2mm !important; 
+                padding: 6mm 2mm 6mm 2mm !important; /* Top/Bottom: 6mm, Sides: 2mm */
                 border: none !important;
                 box-shadow: none !important;
                 overflow: hidden !important;
-                position: relative;
             }
 
-            /* Optimize Spacing to Squeeze Horizontally */
-            .cols {
-                gap: 35px !important; /* Increased column gap for ATS readability */
-            }
+            /* Layout Adjustments */
+            .cols { gap: 35px !important; }
+            .col-left, .col-right { flex-shrink: 1 !important; }
+            .resume-content { width: 100%; zoom: 0.92; }
 
-            /* Ensure columns don't wrap due to increased gap */
-            .col-left, .col-right {
-                flex-shrink: 1 !important;
-            }
-
-            /* Layout Optimization */
-            .resume-content {
-                width: 100%;
-                /* 0.92 zoom allows standard font sizes to fit perfectly on A4 */
-                zoom: 0.92; 
-            }
-
-            /* Refined Spacing for Density */
+            /* Spacing adjustments */
             .resume-header { margin-bottom: 12px !important; }
             .section { margin-bottom: 10px !important; }
-            .exp-item, .sidebar-item { margin-bottom: 6px !important; } /* Tighter item spacing */
-            
-            /* Text Flow Optimization */
-            p, li, .exp-desc, .sidebar-desc { 
-                line-height: 1.35 !important; 
-            }
-            ul.exp-bullets, ul.sidebar-bullets {
-                margin-bottom: 2px !important;
-            }
+            .exp-item, .sidebar-item { margin-bottom: 6px !important; }
+            p, li, .exp-desc, .sidebar-desc { line-height: 1.35 !important; }
+            ul.exp-bullets, ul.sidebar-bullets { margin-bottom: 2px !important; }
         }
     `;
     document.head.appendChild(style);
@@ -283,7 +260,6 @@ window.applySelectionFontSize = function() {
             const content = range.extractContents();
             span.appendChild(content);
             range.insertNode(span);
-            
             let el = span.closest('[data-path]');
             if (el) {
                 const path = el.dataset.path.split('.');
@@ -293,7 +269,6 @@ window.applySelectionFontSize = function() {
                     ref = ref[path[i]];
                 }
                 ref[path[path.length - 1]] = value;
-                console.log('Updated style for:', path.join('.'));
             }
             selection.removeAllRanges();
         } catch (e) {
@@ -305,7 +280,7 @@ window.applySelectionFontSize = function() {
     }
 };
 
-/* --- RENDERERS --- */
+/* --- RENDERERS (Same as before) --- */
 function renderResumeEditable(data) {
     const nameEl = document.getElementById('name');
     nameEl.innerHTML = data.profile.name; 
