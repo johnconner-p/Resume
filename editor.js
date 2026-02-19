@@ -12,16 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initEditor(data) {
-    // Ensure controls exist
     initJsonControl();
+    initWordControl(); // New Word Export
     initPdfControl();
     initFontSizeControl();
 
-    // Render content
     renderSortableLists(data.settings.layout);
     renderResumeEditable(data);
     
-    // Apply saved font preference
     if (data.settings.fontScale) {
         updateFontScale(data.settings.fontScale);
         const slider = document.querySelector('input[type="range"]');
@@ -29,17 +27,14 @@ function initEditor(data) {
     }
 
     // --- ATS OPTIMIZATION: Clean Text Mode ---
-    // This ensures the PDF generator sees RAW TEXT, not "input fields"
     window.addEventListener('beforeprint', () => {
         document.querySelectorAll('[contenteditable]').forEach(el => {
             el.removeAttribute('contenteditable');
         });
-        // Remove editing visual cues
         if(document.getElementById('name')) document.getElementById('name').style.borderBottom = 'none';
         if(document.getElementById('title')) document.getElementById('title').style.borderBottom = 'none';
     });
 
-    // Restore editing capability after print dialog closes
     window.addEventListener('afterprint', () => {
         renderResumeEditable(globalData);
     });
@@ -83,7 +78,35 @@ function initJsonControl() {
     }
 }
 
-// --- PDF Control (ATS Friendly) ---
+// --- Word Export Control (NEW) ---
+function initWordControl() {
+    const sidebar = document.querySelector('.editor-sidebar');
+    if (!sidebar) return;
+
+    const group = document.createElement('div');
+    group.className = 'control-group';
+    group.style.marginTop = '15px';
+
+    group.innerHTML = `
+        <span class="control-label">Word Document</span>
+        <button onclick="downloadWord()" class="btn" style="background: #2b579a; color: white;">
+            <i class="fas fa-file-word"></i> Export to Word
+        </button>
+        <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">
+            Downloads a .doc file editable in MS Word.
+        </div>
+    `;
+    
+    // Insert before PDF control if possible, or append
+    const existing = sidebar.querySelectorAll('.control-group');
+    if(existing.length > 1) {
+        sidebar.insertBefore(group, existing[existing.length - 1]); // Insert before PDF
+    } else {
+        sidebar.appendChild(group);
+    }
+}
+
+// --- PDF Control (ATS Friendly + System Fonts) ---
 function initPdfControl() {
     const sidebar = document.querySelector('.editor-sidebar');
     if (!sidebar) return;
@@ -95,16 +118,12 @@ function initPdfControl() {
     group.style.paddingTop = '15px';
 
     group.innerHTML = `
-        <span class="control-label">Export</span>
+        <span class="control-label">PDF Export</span>
         <button onclick="window.print()" class="btn btn-danger">
             <i class="fas fa-file-pdf"></i> Save as PDF
         </button>
         <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">
-            <strong>Print Settings:</strong><br>
-            • Destination: Save as PDF<br>
-            • Paper Size: A4<br>
-            • Margins: None<br>
-            • Options: Check "Background graphics"
+            <strong>Settings:</strong> A4, No Margins, Background Graphics ON.
         </div>
     `;
     sidebar.appendChild(group);
@@ -113,58 +132,48 @@ function initPdfControl() {
     const style = document.createElement('style');
     style.innerHTML = `
         @media print {
-            @page { 
-                size: A4; 
-                margin: 0mm;
-            }
+            @page { size: A4; margin: 0mm; }
             
             html, body { 
-                width: 210mm;
-                height: 297mm;
-                margin: 0 !important; 
-                padding: 0 !important; 
-                background: white !important; 
-                -webkit-print-color-adjust: exact !important; 
-                print-color-adjust: exact !important;
-                overflow: hidden !important;
+                width: 210mm; height: 297mm; margin: 0 !important; padding: 0 !important; 
+                background: white !important; -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; overflow: hidden !important;
+                /* FORCE SYSTEM FONT FOR SHARP TEXT (Fixes 'I' vs 'l' issue) */
+                font-family: Arial, Helvetica, sans-serif !important; 
             }
 
-            /* Hide Editor UI */
             .editor-sidebar, .control-group, button { display: none !important; }
             
-            /* Clean Text for ATS */
             [contenteditable] { 
-                border: none !important; 
-                outline: none !important; 
-                background: transparent !important; 
-                padding: 0 !important;
+                border: none !important; outline: none !important; 
+                background: transparent !important; padding: 0 !important;
             }
 
-            /* FORCE VISIBLE LINES (Section Divider Fix) */
             .section-title {
                 border-bottom: 1px solid #333 !important;
-                padding-bottom: 2px !important;
-                margin-bottom: 6px !important;
-                display: block !important; /* Ensures it takes up space */
+                padding-bottom: 2px !important; margin-bottom: 6px !important;
+                display: block !important;
             }
 
-            /* A4 Geometry */
             .page {
-                width: 210mm !important;
-                height: 296mm !important;
-                margin: 0 !important;
-                padding: 6mm 2mm 6mm 2mm !important; /* Top/Bottom: 6mm, Sides: 2mm */
-                border: none !important;
-                box-shadow: none !important;
-                overflow: hidden !important;
+                width: 210mm !important; height: 296mm !important; margin: 0 !important;
+                padding: 6mm 2mm 6mm 2mm !important; 
+                border: none !important; box-shadow: none !important;
+                position: relative;
             }
 
-            /* Layout Adjustments */
             .cols { gap: 35px !important; }
             .col-left, .col-right { flex-shrink: 1 !important; }
-            .resume-content { width: 100%; zoom: 0.92; }
+            
+            /* Ensure text is pure vector black */
+            body, h1, h2, h3, p, span, li, div { 
+                color: #000 !important; 
+                text-shadow: none !important; 
+            }
+            /* Exception for muted text if needed, but keeping it dark for ATS */
+            .contact-info, .exp-desc, .sidebar-desc { color: #333 !important; }
 
-            /* Spacing adjustments */
+            .resume-content { width: 100%; zoom: 0.92; }
             .resume-header { margin-bottom: 12px !important; }
             .section { margin-bottom: 10px !important; }
             .exp-item, .sidebar-item { margin-bottom: 6px !important; }
@@ -212,6 +221,35 @@ function initFontSizeControl() {
     sidebar.appendChild(selectionGroup);
 }
 
+// --- Word Export Logic ---
+function downloadWord() {
+    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+        "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+        "xmlns='http://www.w3.org/TR/REC-html40'>" +
+        "<head><meta charset='utf-8'><title>Resume</title></head><body>";
+    
+    const footer = "</body></html>";
+    
+    // Clone the resume content to clean it up
+    const content = document.getElementById('resume-container').cloneNode(true);
+    
+    // Clean up content for Word
+    content.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+    content.querySelectorAll('button').forEach(el => el.remove());
+    
+    // Convert to string
+    const sourceHTML = header + content.innerHTML + footer;
+    
+    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+    const fileDownload = document.createElement("a");
+    document.body.appendChild(fileDownload);
+    fileDownload.href = source;
+    fileDownload.download = 'resume.doc';
+    fileDownload.click();
+    document.body.removeChild(fileDownload);
+}
+
+// --- Updates (Font Scale, Text Selection, Titles) ---
 window.updateFontScale = function(scale) {
     if (globalData && globalData.settings) {
         globalData.settings.fontScale = scale;
@@ -247,15 +285,12 @@ window.applySelectionFontSize = function() {
     const selection = window.getSelection();
     if (selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
-        
         if (!document.getElementById('resume-container').contains(range.commonAncestorContainer)) {
              alert('Please select text inside the resume.');
              return;
         }
-
         const span = document.createElement('span');
         span.style.fontSize = size + 'pt';
-        
         try {
             const content = range.extractContents();
             span.appendChild(content);
@@ -265,22 +300,17 @@ window.applySelectionFontSize = function() {
                 const path = el.dataset.path.split('.');
                 const value = el.innerHTML;
                 let ref = globalData;
-                for (let i = 0; i < path.length - 1; i++) {
-                    ref = ref[path[i]];
-                }
+                for (let i = 0; i < path.length - 1; i++) { ref = ref[path[i]]; }
                 ref[path[path.length - 1]] = value;
             }
             selection.removeAllRanges();
         } catch (e) {
-            console.error("Could not apply font size", e);
-            alert("Could not apply style.");
+            console.error(e);
         }
-    } else {
-        alert('Please select some text first.');
     }
 };
 
-/* --- RENDERERS (Same as before) --- */
+/* --- RENDERERS (Unchanged logic, just ensure existence) --- */
 function renderResumeEditable(data) {
     const nameEl = document.getElementById('name');
     nameEl.innerHTML = data.profile.name; 
@@ -294,9 +324,9 @@ function renderResumeEditable(data) {
     titleEl.setAttribute('data-path', 'profile.title');
     titleEl.style.borderBottom = '1px dashed #ccc'; 
 
+    // Header Structure Fix (Move Contacts)
     const headerLeft = document.querySelector('.header-left');
     const contactDiv = document.getElementById('contact');
-    
     if (headerLeft && contactDiv && contactDiv.parentElement !== headerLeft) {
         headerLeft.appendChild(contactDiv);
         contactDiv.style.textAlign = 'left';
@@ -324,15 +354,10 @@ function renderResumeEditable(data) {
 function renderSectionEditable(key, data, container) {
     const sectionData = data[key];
     const sectionTitle = data.settings.titles[key] || key;
-    
     const section = document.createElement('section');
     section.className = 'section';
     section.dataset.key = key; 
-
-    section.innerHTML = `
-        <h3 class="section-title" contenteditable="true" onblur="updateTitle('${key}', this.innerText)">${sectionTitle}</h3>
-    `;
-    
+    section.innerHTML = `<h3 class="section-title" contenteditable="true" onblur="updateTitle('${key}', this.innerText)">${sectionTitle}</h3>`;
     const contentDiv = document.createElement('div');
     section.appendChild(contentDiv);
     container.appendChild(section);
@@ -468,11 +493,8 @@ function attachLiveUpdaters() {
         el.addEventListener('blur', (e) => {
             const path = e.target.dataset.path.split('.');
             const value = e.target.innerHTML; 
-            
             let ref = globalData;
-            for (let i = 0; i < path.length - 1; i++) {
-                ref = ref[path[i]];
-            }
+            for (let i = 0; i < path.length - 1; i++) { ref = ref[path[i]]; }
             ref[path[path.length - 1]] = value;
         });
     });
@@ -489,9 +511,7 @@ function updateSummary(newText) {
 function renderSortableLists(layout) {
     const listLeft = document.getElementById('list-left');
     const listRight = document.getElementById('list-right');
-    listLeft.innerHTML = '';
-    listRight.innerHTML = '';
-
+    listLeft.innerHTML = ''; listRight.innerHTML = '';
     const createLi = (id) => {
         const li = document.createElement('li');
         li.className = 'sortable-item';
@@ -499,10 +519,8 @@ function renderSortableLists(layout) {
         li.innerText = globalData.settings.titles[id] || id.toUpperCase();
         return li;
     };
-
     layout.left.forEach(id => listLeft.appendChild(createLi(id)));
     layout.right.forEach(id => listRight.appendChild(createLi(id)));
-
     new Sortable(listLeft, { group: 'sections', animation: 150 });
     new Sortable(listRight, { group: 'sections', animation: 150 });
 }
@@ -510,10 +528,8 @@ function renderSortableLists(layout) {
 function updateLayoutFromSidebar() {
     const leftItems = Array.from(document.getElementById('list-left').children).map(li => li.dataset.id);
     const rightItems = Array.from(document.getElementById('list-right').children).map(li => li.dataset.id);
-
     globalData.settings.layout.left = leftItems;
     globalData.settings.layout.right = rightItems;
-
     renderResumeEditable(globalData);
 }
 
